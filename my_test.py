@@ -1,5 +1,4 @@
 import torch
 
-s=set(['a','b'])
-print(s.add('c'))
-print(s)
+a=[1,2,3]
+print(a[:])

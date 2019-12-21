@@ -7,7 +7,7 @@ class DefaultConfig(object):
     seed = 0
 
     # dataset options
-    dataset = 'market1501'
+    dataset = 'Market1501'
     datatype = 'person'
     mode = 'retrieval'
     # optimization options
