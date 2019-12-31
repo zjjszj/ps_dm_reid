@@ -39,7 +39,7 @@ class DefaultConfig(object):
     print_freq = 30
     eval_step = 50
     save_dir = './pytorch-ckpt/market'
-    workers = 10
+    workers = 5
     start_epoch = 0
     best_rank = -np.inf
 
