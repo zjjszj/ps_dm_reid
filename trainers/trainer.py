@@ -46,6 +46,7 @@ class cls_tripletTrainer:
 
             start = time.time()
 
+            # len(data_loader)=len(RandomIdentitySampler)/len(batch_size)=751*4/32=93
             if (i + 1) % self.opt.print_freq == 0:
                 print('Epoch: [{}][{}/{}]\t'
                       'Batch Time {:.3f} ({:.3f})\t'
