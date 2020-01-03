@@ -46,7 +46,6 @@ class cls_tripletTrainer:
 
             start = time.time()
 
-            #len(data_loader)=len(RandomIdentitySampler)/len(batch_size)=751*4/32=93
             if (i + 1) % self.opt.print_freq == 0:
                 print('Epoch: [{}][{}/{}]\t'
                       'Batch Time {:.3f} ({:.3f})\t'
@@ -61,7 +60,6 @@ class cls_tripletTrainer:
               'Lr {:.2e}'
               .format(epoch, batch_time.sum, losses.mean, param_group[0]['lr']))
         print()
-
 
     def _parse_data(self, inputs):
         imgs, pids, _ = inputs

@@ -13,7 +13,7 @@ class DefaultConfig(object):
     # optimization options
     loss = 'triplet'
     optim = 'adam'
-    max_epoch = 200      #400
+    max_epoch = 60
     train_batch = 32 
     test_batch = 32
     adjust_lr = False
@@ -37,10 +37,9 @@ class DefaultConfig(object):
     
     # miscs
     print_freq = 30
-    #评估并保存的伦数
-    eval_step = 30
+    eval_step = 50
     save_dir = './pytorch-ckpt/market'
-    workers = 4   #多线程读数据
+    workers = 5
     start_epoch = 0
     best_rank = -np.inf
 
