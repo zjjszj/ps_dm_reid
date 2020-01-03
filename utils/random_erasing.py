@@ -27,11 +27,29 @@ class Cutout(object):
                 x1 = random.randint(0, img.size()[1] - h)
                 y1 = random.randint(0, img.size()[2] - w)
                 if img.size()[0] == 3:
-                    img[0, x1:x1+h, y1:y1+w] = self.mean[0]
-                    img[1, x1:x1+h, y1:y1+w] = self.mean[1]
-                    img[2, x1:x1+h, y1:y1+w] = self.mean[2]
+                    # img[0, x1:x1+h, y1:y1+w] = self.mean[0]
+                    # img[1, x1:x1+h, y1:y1+w] = self.mean[1]
+                    # img[2, x1:x1+h, y1:y1+w] = self.mean[2]
+
+                    # 求被cutout区域的均值
+                    region = img[0, x1:x1 + h, y1:y1 + w]
+                    region_aveg = torch.sum(region) / (w * h)
+                    img[0, x1:x1 + h, y1:y1 + w] = region_aveg
+
+                    region = img[1, x1:x1 + h, y1:y1 + w]
+                    region_aveg = torch.sum(region) / (w * h)
+                    img[1, x1:x1 + h, y1:y1 + w] = region_aveg
+
+                    region = img[2, x1:x1 + h, y1:y1 + w]
+                    region_aveg = torch.sum(region) / (w * h)
+                    img[2, x1:x1 + h, y1:y1 + w] = region_aveg
+
                 else:
-                    img[0, x1:x1+h, y1:y1+w] = self.mean[0]
+                    # img[0, x1:x1+h, y1:y1+w] = self.mean[0]
+
+                    region = img[0, x1:x1 + h, y1:y1 + w]
+                    region_aveg = torch.sum(region) / (w * h)
+                    img[0, x1:x1 + h, y1:y1 + w] = region_aveg
                 return img
         return img
 
