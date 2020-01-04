@@ -111,6 +111,7 @@ class TripletLoss(object):
             self.ranking_loss = nn.SoftMarginLoss()
 
     def __call__(self, global_feat, labels, normalize_feature=False):
+        print('global_feat.shape=512/1024*2====',global_feat.shape)
         if normalize_feature:
             global_feat = normalize(global_feat, axis=-1)
         dist_mat = euclidean_dist(global_feat, global_feat)

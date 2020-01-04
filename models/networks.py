@@ -204,6 +204,7 @@ class BFE(nn.Module):
         global_triplet_feature = self.global_reduction(glob).squeeze()
         global_softmax_class = self.global_softmax(global_triplet_feature)
         softmax_features.append(global_softmax_class)
+        print('global_triplet_feature.shape====',global_triplet_feature.shape)
         triplet_features.append(global_triplet_feature)
         predict.append(global_triplet_feature)
        
@@ -214,11 +215,13 @@ class BFE(nn.Module):
         triplet_feature = self.part_maxpool(x).squeeze()
         feature = self.reduction(triplet_feature)
         softmax_feature = self.softmax(feature)
+        print('feature.shape====',feature.shape)
         triplet_features.append(feature)
         softmax_features.append(softmax_feature)
         predict.append(feature)
 
         if self.training:
+            print('triplet_features=======',triplet_features)
             return triplet_features, softmax_features
         else:
             return torch.cat(predict, 1)
