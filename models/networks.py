@@ -72,7 +72,8 @@ class BatchDrop(nn.Module):
             mask = x.new_ones(x.size())
             mask[:, :, sx:sx+rh, sy:sy+rw] = 0
             x = x * mask
-        print('x.shape====',x.shape)
+        #print('x.shape====',x.shape)        [32, 2048, 24, 8]
+        print(x)
 
             #用均值代替
             # c,h, w = x.size()[-3:]
