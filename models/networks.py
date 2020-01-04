@@ -64,29 +64,14 @@ class BatchDrop(nn.Module):
     
     def forward(self, x):
         if self.training:
-        #     h, w = x.size()[-2:]
-        #     rh = round(self.h_ratio * h)
-        #     rw = round(self.w_ratio * w)
-        #     sx = random.randint(0, h-rh)
-        #     sy = random.randint(0, w-rw)
-        #     mask = x.new_ones(x.size())
-        #     mask[:, :, sx:sx+rh, sy:sy+rw] = 0
-        #     x = x * mask
-        # #print('x.shape====',x.shape)        [32, 2048, 24, 8]
-        # print(x)
-
-            #用均值代替
-            c,h, w = x.size()[-3:]
+            h, w = x.size()[-2:]
             rh = round(self.h_ratio * h)
             rw = round(self.w_ratio * w)
             sx = random.randint(0, h-rh)
             sy = random.randint(0, w-rw)
-            for i in range(c):
-                scope=x[:,i,sx:sx+rh, sy:sy+rw]
-                scope_aveg=torch.sum(scope)/(rh*rw)
-                x[:, i, sx:sx + rh, sy:sy + rw]=scope_aveg
-            #print('x.shape===',x.shape)    [32, 2048, 24, 8]
-            print(x)
+            mask = x.new_ones(x.size())
+            mask[:, :, sx:sx+rh, sy:sy+rw] = 0
+            x = x * mask    #x shape=[32, 2048, 24, 8]
         return x
 
 class BatchCrop(nn.Module):
