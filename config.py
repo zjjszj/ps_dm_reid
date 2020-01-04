@@ -13,7 +13,7 @@ class DefaultConfig(object):
     # optimization options
     loss = 'triplet'
     optim = 'adam'
-    max_epoch = 60      #400
+    max_epoch = 200      #400
     train_batch = 32 
     test_batch = 32
     adjust_lr = False
