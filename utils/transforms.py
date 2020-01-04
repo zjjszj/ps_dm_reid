@@ -79,10 +79,10 @@ class TrainTransform(object):
         x = T.ToTensor()(x)
         x = T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(x)
         #Cutout预处理
-        # if self.data == 'person':
-        #     x = Cutout(probability = 0.5, size=64, mean=[0.0, 0.0, 0.0])(x)
-        # else:
-        #     x = RandomErasing(probability = 0.5, mean=[0.0, 0.0, 0.0])(x)
+        if self.data == 'person':
+            x = Cutout(probability = 0.5, size=64, mean=[0.0, 0.0, 0.0])(x)
+        else:
+            x = RandomErasing(probability = 0.5, mean=[0.0, 0.0, 0.0])(x)
         return x
 
 

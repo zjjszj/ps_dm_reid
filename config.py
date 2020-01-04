@@ -13,12 +13,11 @@ class DefaultConfig(object):
     # optimization options
     loss = 'triplet'
     optim = 'adam'
-    max_epoch = 60      #400
+    max_epoch = 400      #400
     train_batch = 32
     test_batch = 32
     adjust_lr = False
     lr = 0.0001
-    adjust_lr = False
     gamma = 0.1
     weight_decay = 5e-4
     momentum = 0.9
