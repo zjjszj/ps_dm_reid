@@ -64,14 +64,25 @@ class BatchDrop(nn.Module):
     
     def forward(self, x):
         if self.training:
-            h, w = x.size()[-2:]
+            # h, w = x.size()[-2:]
+            # rh = round(self.h_ratio * h)
+            # rw = round(self.w_ratio * w)
+            # sx = random.randint(0, h-rh)
+            # sy = random.randint(0, w-rw)
+            # mask = x.new_ones(x.size())
+            # mask[:, :, sx:sx+rh, sy:sy+rw] = 0
+            # x = x * mask
+
+            #用均值代替
+            c,h, w = x.size()[-3:]
             rh = round(self.h_ratio * h)
             rw = round(self.w_ratio * w)
             sx = random.randint(0, h-rh)
             sy = random.randint(0, w-rw)
-            mask = x.new_ones(x.size())
-            mask[:, :, sx:sx+rh, sy:sy+rw] = 0
-            x = x * mask
+            for i in range(c):
+                scope=x[:,i,sx:sx+rh, sy:sy+rw]
+                scope_aveg=torch.sum(scope)/(rh*rw)
+                x[:, i, sx:sx + rh, sy:sy + rw]=scope_aveg
         return x
 
 class BatchCrop(nn.Module):
@@ -201,10 +212,9 @@ class BFE(nn.Module):
 
         #global branch
         glob = self.global_avgpool(x)
-        global_triplet_feature = self.global_reduction(glob).squeeze()
+        global_triplet_feature = self.global_reduction(glob).squeeze()   #[N, 512]
         global_softmax_class = self.global_softmax(global_triplet_feature)
         softmax_features.append(global_softmax_class)
-        print('global_triplet_feature.shape====',global_triplet_feature.shape)
         triplet_features.append(global_triplet_feature)
         predict.append(global_triplet_feature)
        
@@ -213,9 +223,8 @@ class BFE(nn.Module):
 
         x = self.batch_crop(x)
         triplet_feature = self.part_maxpool(x).squeeze()
-        feature = self.reduction(triplet_feature)
+        feature = self.reduction(triplet_feature)  #[N, 1024]
         softmax_feature = self.softmax(feature)
-        print('feature.shape====',feature.shape)
         triplet_features.append(feature)
         softmax_features.append(softmax_feature)
         predict.append(feature)
