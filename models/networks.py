@@ -83,6 +83,7 @@ class BatchDrop(nn.Module):
                 scope=x[:,i,sx:sx+rh, sy:sy+rw]
                 scope_aveg=torch.sum(scope)/(rh*rw)
                 x[:, i, sx:sx + rh, sy:sy + rw]=scope_aveg
+            print('x.shape===',x.shape)
         return x
 
 class BatchCrop(nn.Module):
@@ -230,7 +231,6 @@ class BFE(nn.Module):
         predict.append(feature)
 
         if self.training:
-            print('triplet_features=======',triplet_features)
             return triplet_features, softmax_features
         else:
             return torch.cat(predict, 1)
