@@ -17,15 +17,11 @@ import random
 #     x[:, i, sx:sx + rh, sy:sy + rw]=scope_aveg
 #
 # print('x===',x)
-
-a=[1,2]
-print(sum(a))
-
-
-
-
-
-
+from torch.autograd import Variable
+a=torch.tensor([[1,2],[2,2.0]]).cuda()
+b=torch.tensor([[1,2],[2,2.0]]).cuda()
+c=b.mm(a.t())
+print(c)
 
 
 

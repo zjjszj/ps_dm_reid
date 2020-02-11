@@ -136,7 +136,7 @@ class OIM(autograd.Function):
 
     def forward(self, inputs, targets):
         self.save_for_backward(inputs, targets)
-        outputs = inputs.mm(self.lut.t())
+        outputs = inputs.mm(self.lut.t())  #cuda类型与cuda类型计算
         return outputs
 
     def backward(self, grad_outputs):
@@ -165,7 +165,7 @@ class OIMLoss(nn.Module):
         self.weight = weight
         self.size_average = size_average
 
-        self.register_buffer('lut', torch.zeros(num_classes, num_features))
+        self.register_buffer('lut', torch.zeros(num_classes, num_features).cuda())  #使用cuda类型
 
     def forward(self, inputs, targets):
         inputs = oim(inputs, targets, self.lut, momentum=self.momentum) #(N,d)、输出得分
