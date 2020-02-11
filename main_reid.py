@@ -131,7 +131,8 @@ def train(**kwargs):
             embedding_criterion_global = OIMLoss(num_features=512, num_classes=751)
             embedding_criterion_drop = OIMLoss(num_features=1024, num_classes=751)
             loss= [embedding_criterion_global(triplet_y[0], labels)[0]]+\
-                     [embedding_criterion_drop(triplet_y[1], labels)[0]][0]
+                     [embedding_criterion_drop(triplet_y[1], labels)[0]]
+            loss=loss[0]
         else:
             losses = [embedding_criterion(output, labels)[0] for output in triplet_y] + \
                          [xent_criterion(output, labels) for output in softmax_y]
