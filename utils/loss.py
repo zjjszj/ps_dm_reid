@@ -129,7 +129,7 @@ class OIM(autograd.Function):
     """myself
     Modified from Tong Xiao's open-reid (https://github.com/Cysu/open-reid).
     """
-    def __init__(self, lut, momentum=0.5):
+    def __init__(self):
         super(OIM, self).__init__()
 
     def forward(ctx,inputs, targets,lut,momentum):
