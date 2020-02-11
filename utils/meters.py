@@ -25,6 +25,8 @@ class AverageMeter(object):
             self.mean, self.std = self.sum, np.inf
         else:
             self.mean = self.sum / self.n
+            print('(self.var - self.n * self.mean * self.mean) / (self.n - 1.0)===',
+                  (self.var - self.n * self.mean * self.mean) / (self.n - 1.0))
             self.std = math.sqrt(
                 (self.var - self.n * self.mean * self.mean) / (self.n - 1.0))
 
