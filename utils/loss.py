@@ -131,28 +131,25 @@ class OIM(autograd.Function):
     """
     def __init__(self, lut, momentum=0.5):
         super(OIM, self).__init__()
-        self.lut = lut
-        self.momentum = momentum
 
-    def forward(self, inputs, targets):
-        self.save_for_backward(inputs, targets)
-        outputs = inputs.mm(self.lut.t())  #cuda类型与cuda类型计算
+    def forward(ctx,inputs, targets,lut,momentum):
+        ctx.save_for_backward(inputs, targets, lut, momentum)
+        outputs = inputs.mm(lut.t())  #cuda类型与cuda类型计算
         return outputs
 
-    def backward(self, grad_outputs):
-        inputs, targets = self.saved_tensors
+    def backward(ctx, grad_outputs):
+        inputs, targets, lut, momentum= ctx.saved_tensors
         grad_inputs = None
-        if self.needs_input_grad[0]:
-            grad_inputs = grad_outputs.mm(self.lut)
+        if ctx.needs_input_grad[0]:
+            grad_inputs = grad_outputs.mm(lut)
         for x, y in zip(inputs, targets):
-            print('run oim backward=======================')
-            self.lut[y] = self.momentum * self.lut[y] + (1. - self.momentum) * x
-            self.lut[y] /= self.lut[y].norm()
+            lut[y] = momentum * lut[y] + (1. - momentum) * x
+            lut[y] /= lut[y].norm()
         return grad_inputs, None
 
 
 def oim(inputs, targets, lut, momentum=0.5):
-    return OIM(lut, momentum=momentum)(inputs, targets)
+    return OIM()(inputs, targets,lut,momentum)
 
 
 class OIMLoss(nn.Module):
@@ -169,7 +166,7 @@ class OIMLoss(nn.Module):
         self.register_buffer('lut', torch.zeros(num_classes, num_features).cuda())  #使用cuda类型
 
     def forward(self, inputs, targets):
-        inputs = oim(inputs, targets, self.lut, momentum=self.momentum) #(N,d)、输出得分
+        inputs = oim(inputs, targets, self.lut, self.momentum) #(N,d)、输出得分
         inputs *= self.scalar
         loss = F.cross_entropy(inputs, targets, weight=self.weight,
                                reduction=self.reduction)
