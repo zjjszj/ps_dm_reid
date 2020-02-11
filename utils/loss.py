@@ -134,13 +134,11 @@ class OIM(autograd.Function):
         self.lut = lut
         self.momentum = momentum
 
-    @staticmethod
     def forward(self, inputs, targets):
         self.save_for_backward(inputs, targets)
         outputs = inputs.mm(self.lut.t())  #cuda类型与cuda类型计算
         return outputs
 
-    @staticmethod
     def backward(self, grad_outputs):
         inputs, targets = self.saved_tensors
         grad_inputs = None
