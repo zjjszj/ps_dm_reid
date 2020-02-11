@@ -130,6 +130,7 @@ def train(**kwargs):
         if opt.loss=='oim':
             embedding_criterion_global = OIMLoss(num_features=512, num_classes=751)
             embedding_criterion_drop = OIMLoss(num_features=1024, num_classes=751)
+            print('triplet_y[0]=======',triplet_y[0])
             loss = [embedding_criterion_global(triplet_y[0], labels)[0]]+\
                      [embedding_criterion_drop(triplet_y[1], labels)[0]]
         else:
