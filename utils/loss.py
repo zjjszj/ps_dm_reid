@@ -129,11 +129,13 @@ class OIM(autograd.Function):
     """myself
     Modified from Tong Xiao's open-reid (https://github.com/Cysu/open-reid).
     """
+    @staticmethod
     def forward(ctx,inputs, targets,lut,momentum):
         ctx.save_for_backward(inputs, targets, lut, momentum)
         outputs = inputs.mm(lut.t())  #cuda类型与cuda类型计算
         return outputs
 
+    @staticmethod
     def backward(ctx, grad_outputs):
         inputs, targets, lut, momentum= ctx.saved_tensors
         grad_inputs = None
