@@ -37,7 +37,7 @@ class cls_tripletTrainer:
             self.optimizer.step()
 
             batch_time.update(time.time() - start)
-            print('losses.update()===============')
+            print('self.loss.item()===============',self.loss.item())
             losses.update(self.loss.item())
 
             # tensorboard

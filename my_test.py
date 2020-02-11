@@ -17,9 +17,7 @@ import random
 #     x[:, i, sx:sx + rh, sy:sy + rw]=scope_aveg
 #
 # print('x===',x)
-import math
-a=torch.tensor([2]).cuda().item()
-print(a)
+
 
 
 
