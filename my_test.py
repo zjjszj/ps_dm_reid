@@ -18,9 +18,8 @@ import random
 #
 # print('x===',x)
 import math
-a=math.sqrt(-1)
+a=torch.tensor([2]).cuda().item()
 print(a)
-
 
 
 

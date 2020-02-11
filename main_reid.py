@@ -133,7 +133,7 @@ def train(**kwargs):
             loss= [embedding_criterion_global(triplet_y[0], labels)[0]]+\
                      [embedding_criterion_drop(triplet_y[1], labels)[0]]
             loss=loss[0]
-            print('loss==========',loss)
+            #print('loss==========',loss) 6.6214
         else:
             losses = [embedding_criterion(output, labels)[0] for output in triplet_y] + \
                          [xent_criterion(output, labels) for output in softmax_y]
