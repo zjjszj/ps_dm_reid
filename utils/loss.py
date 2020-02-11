@@ -145,6 +145,7 @@ class OIM(autograd.Function):
         if self.needs_input_grad[0]:
             grad_inputs = grad_outputs.mm(self.lut)
         for x, y in zip(inputs, targets):
+            print('run oim backward=======================')
             self.lut[y] = self.momentum * self.lut[y] + (1. - self.momentum) * x
             self.lut[y] /= self.lut[y].norm()
         return grad_inputs, None
