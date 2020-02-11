@@ -18,7 +18,7 @@ from datasets.samplers import RandomIdentitySampler
 from models.networks import ResNetBuilder, IDE, Resnet, BFE
 from trainers.evaluator import ResNetEvaluator
 from trainers.trainer import cls_tripletTrainer
-from utils.loss import CrossEntropyLabelSmooth, TripletLoss, Margin
+from utils.loss import CrossEntropyLabelSmooth, TripletLoss, Margin, OIMLoss
 from utils.LiftedStructure import LiftedStructureLoss
 from utils.DistWeightDevianceLoss import DistWeightBinDevianceLoss
 from utils.serialization import Logger, save_checkpoint
@@ -126,11 +126,18 @@ def train(**kwargs):
     elif opt.loss == 'weight':
         embedding_criterion = Margin()
 
-    def criterion(triplet_y, softmax_y, labels):   #输出向量、输出得分、标签
-        losses = [embedding_criterion(output, labels)[0] for output in triplet_y] + \
-                     [xent_criterion(output, labels) for output in softmax_y]
-        loss = sum(losses)
+    def criterion(triplet_y, softmax_y, labels):   #输出向量[全局，局部]、输出得分、标签
+        if opt.loss=='oim':
+            embedding_criterion_global = OIMLoss(num_features=512, num_classes=751)
+            embedding_criterion_drop = OIMLoss(num_features=1024, num_classes=751)
+            loss = [embedding_criterion_global(triplet_y[0], labels)[0]]+\
+                     [embedding_criterion_drop(triplet_y[1], labels)[0]]
+        else:
+            losses = [embedding_criterion(output, labels)[0] for output in triplet_y] + \
+                         [xent_criterion(output, labels) for output in softmax_y]
+            loss = sum(losses)
         return loss
+
 
     # get optimizer
     if opt.optim == "sgd":
