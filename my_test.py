@@ -17,8 +17,9 @@ import random
 #     x[:, i, sx:sx + rh, sy:sy + rw]=scope_aveg
 #
 # print('x===',x)
-a=[2]
-print(a[0])
+import math
+a=math.sqrt(-1)
+print(a)
 
 
 
