@@ -18,27 +18,28 @@ import random
 #
 # print('x===',x)
 
-import torch
 from torch import autograd
-class MyFunc(autograd.Function):
+from torch.autograd import Variable
+
+class Exp(autograd.Function):
     @staticmethod
-    def forward(ctx, inp):
-        return inp.clone()
+    def forward(ctx, i,m):
+        result = i.exp()
+        ctx.save_for_backward(result,m)
+        return result
     @staticmethod
-    def backward(ctx, gO):
-        # Error during the backward pass
-        raise RuntimeError("Some error in backward")
-        return gO.clone()
-def run_fn(a):
-    out = MyFunc.apply(a)
-    return out.sum()
-inp = torch.rand(10, 10, requires_grad=True)
-out = run_fn(inp)
-out.backward()
+    def backward(ctx, grad_output):
+        grad_output=2
+        result, m= ctx.saved_tensors
+        m=m*2
+        print('m=====',m)
+        return grad_output * result,None
 
 
-
-
+a=torch.tensor(2.0,requires_grad=True)
+v=Exp.apply(a,torch.tensor(2))
+v.backward()
+print(a.grad)
 
 
 

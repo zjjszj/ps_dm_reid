@@ -129,9 +129,6 @@ class OIM(autograd.Function):
     """myself
     Modified from Tong Xiao's open-reid (https://github.com/Cysu/open-reid).
     """
-    def __init__(self):
-        super(OIM, self).__init__()
-
     def forward(ctx,inputs, targets,lut,momentum):
         ctx.save_for_backward(inputs, targets, lut, momentum)
         outputs = inputs.mm(lut.t())  #cuda类型与cuda类型计算
@@ -145,11 +142,11 @@ class OIM(autograd.Function):
         for x, y in zip(inputs, targets):
             lut[y] = momentum * lut[y] + (1. - momentum) * x
             lut[y] /= lut[y].norm()
-        return grad_inputs, None
+        return grad_inputs, None, None, None
 
 
 def oim(inputs, targets, lut, momentum=0.5):
-    return OIM()(inputs, targets,lut,momentum)
+    return OIM.apply(inputs, targets,lut,torch.tensor(momentum))
 
 
 class OIMLoss(nn.Module):
