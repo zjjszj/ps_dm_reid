@@ -161,11 +161,7 @@ class BFE(nn.Module):
             Bottleneck(2048, 512),
         )
         self.res_part.load_state_dict(resnet.layer4.state_dict())
-        reduction = nn.Sequential(
-            nn.Conv2d(2048, 512, 1),
-            nn.BatchNorm2d(512),
-            nn.ReLU()
-        )
+
          # global branch
 
 
@@ -236,11 +232,9 @@ class BFE(nn.Module):
         params = [
             {'params': self.backbone.parameters()},
             {'params': self.res_part.parameters()},
-            {'params': self.global_reduction.parameters()},
-            {'params': self.global_softmax.parameters()},
             {'params': self.res_part2.parameters()},
-            {'params': self.reduction.parameters()},
-            {'params': self.softmax.parameters()},
+            {'params': self.fusion_conv1x1.parameters()},
+            {'params': self.fusion_conv3x3.parameters()},
         ]
         return params
 
