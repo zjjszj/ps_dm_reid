@@ -194,30 +194,40 @@ class BFE(nn.Module):
         """
         x = self.backbone(x)
         x = self.res_part(x)    #layer4/res_conv5
-        print('x.size()====',x.size())
+        print('')
         predict = []
         triplet_features = []
         softmax_features = []
 
         #global branch
-        glob = self.global_avgpool(x)  #[2048,1,1]
-        global_triplet_feature = self.global_reduction(glob).squeeze()   #[N, 512]
-        global_softmax_class = self.global_softmax(global_triplet_feature)
-        softmax_features.append(global_softmax_class)
-        triplet_features.append(global_triplet_feature)
-        predict.append(global_triplet_feature)
+        glob = self.global_avgpool(x)  #(2048,1,1)
+        # update network.Fusion feature map
+        # global_triplet_feature = self.global_reduction(glob).squeeze()   #[N, 512]
+        # global_softmax_class = self.global_softmax(global_triplet_feature)
+        # softmax_features.append(global_softmax_class)
+        # triplet_features.append(global_triplet_feature)
+        # predict.append(global_triplet_feature)
        
         #part branch
         x = self.res_part2(x)
 
         x = self.batch_crop(x)
-        print('part x.size()====',x.size())
-        triplet_feature = self.part_maxpool(x).squeeze()  #[N, 2048]
-        feature = self.reduction(triplet_feature)  #[N, 1024]
-        softmax_feature = self.softmax(feature)
-        triplet_features.append(feature)
-        softmax_features.append(softmax_feature)
-        predict.append(feature)
+        #update network.Fusion feature map
+        triplet_features=self.part_maxpool(x)
+        fusion_map=glob+triplet_features   #(2048,1,1)
+        fusion_conv=nn.Sequential(
+            nn.Conv2d(2048,1024,1),
+            nn.BatchNorm1d(1024),
+            nn.ReLU()
+
+        )
+
+        # triplet_feature = self.part_maxpool(x).squeeze()  #[N, 2048]
+        # feature = self.reduction(triplet_feature)  #[N, 1024]
+        # softmax_feature = self.softmax(feature)
+        # triplet_features.append(feature)
+        # softmax_features.append(softmax_feature)
+        # predict.append(feature)
         ##融合全局和drop局部特征向量
         ##fusion=(global_triplet_feature+feature)/2
         if self.training:
