@@ -18,9 +18,4 @@ import random
 #
 # print('x===',x)
 
-x=torch.tensor((2,3))
-print(x)
-y=torch.tensor([[2,3]])
-print(y)
-print(x.size())
-print(y.size())
+

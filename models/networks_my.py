@@ -194,46 +194,50 @@ class BFE(nn.Module):
         """
         x = self.backbone(x)
         x = self.res_part(x)    #layer4/res_conv5
-        print('')
+        global_feature=x
         predict = []
         triplet_features = []
         softmax_features = []
 
         #global branch
-        glob = self.global_avgpool(x)  #(2048,1,1)
-        # update network.Fusion feature map
+        # glob = self.global_avgpool(x)  # (2048,1,1)
         # global_triplet_feature = self.global_reduction(glob).squeeze()   #[N, 512]
         # global_softmax_class = self.global_softmax(global_triplet_feature)
         # softmax_features.append(global_softmax_class)
         # triplet_features.append(global_triplet_feature)
         # predict.append(global_triplet_feature)
-       
+
         #part branch
         x = self.res_part2(x)
-
         x = self.batch_crop(x)
-        #update network.Fusion feature map
-        triplet_features=self.part_maxpool(x)
-        fusion_map=glob+triplet_features   #(2048,1,1)
-        fusion_conv=nn.Sequential(
-            nn.Conv2d(2048,1024,1),
-            nn.BatchNorm1d(1024),
-            nn.ReLU()
-
-        )
-
         # triplet_feature = self.part_maxpool(x).squeeze()  #[N, 2048]
         # feature = self.reduction(triplet_feature)  #[N, 1024]
         # softmax_feature = self.softmax(feature)
         # triplet_features.append(feature)
         # softmax_features.append(softmax_feature)
         # predict.append(feature)
-        ##融合全局和drop局部特征向量
-        ##fusion=(global_triplet_feature+feature)/2
+
+        ### update network.Fusion feature map
+        local_feature = x
+        fusion_feature = global_feature + local_feature
+        fusion_conv = nn.Sequential(
+            nn.Conv2d(2048, 1024, 1),
+            nn.BatchNorm1d(1024),
+            nn.ReLU(),
+            nn.Conv2d(1024, 512, 3, stride=2, padding=1),
+            nn.BatchNorm1d(512),
+            nn.ReLU()
+        )
+        x = fusion_conv(fusion_feature)  # [512,12,4]
+        # 最大池化
+        maxpool = nn.AdaptiveMaxPool2d((1, 1))
+        x = maxpool(x).squeeze()  # [512,1，1]
+        ###end
+
         if self.training:
-            return triplet_features, softmax_features
+            return x
         else:
-            return torch.cat(predict, 1)
+            return x
 
     def get_optim_policy(self):
         params = [

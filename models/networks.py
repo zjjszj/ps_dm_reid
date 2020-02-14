@@ -193,8 +193,8 @@ class BFE(nn.Module):
         :return: (prediction, triplet_losses, softmax_losses)
         """
         x = self.backbone(x)
-        x = self.res_part(x)    #layer4/res_conv5
-        print('x.size()====',x.size())
+        x = self.res_part(x)    #layer4/res_conv5         [32, 2048, 24, 8]
+
         predict = []
         triplet_features = []
         softmax_features = []
@@ -210,8 +210,7 @@ class BFE(nn.Module):
         #part branch
         x = self.res_part2(x)
 
-        x = self.batch_crop(x)
-        print('part x.size()====',x.size())
+        x = self.batch_crop(x)  #[32, 2048, 24, 8]
         triplet_feature = self.part_maxpool(x).squeeze()  #[N, 2048]
         feature = self.reduction(triplet_feature)  #[N, 1024]
         softmax_feature = self.softmax(feature)
