@@ -167,25 +167,25 @@ class BFE(nn.Module):
             nn.ReLU()
         )
          # global branch
-        self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.global_softmax = nn.Linear(512, num_classes)
-        self.global_softmax.apply(weights_init_kaiming)
-        self.global_reduction = copy.deepcopy(reduction)
-        self.global_reduction.apply(weights_init_kaiming)
+
 
         # part branch
         self.res_part2 = Bottleneck(2048, 512)
-     
-        self.part_maxpool = nn.AdaptiveMaxPool2d((1,1))
         self.batch_crop = BatchDrop(height_ratio, width_ratio)
-        self.reduction = nn.Sequential(
-            nn.Linear(2048, 1024, 1),
+
+        ###myself
+        self.fusion_conv1x1 = nn.Sequential(
+            nn.Conv2d(2048, 1024, 1),
             nn.BatchNorm1d(1024),
             nn.ReLU()
         )
-        self.reduction.apply(weights_init_kaiming)
-        self.softmax = nn.Linear(1024, num_classes)
-        self.softmax.apply(weights_init_kaiming)
+        self.fusion_conv3x3 = nn.Sequential(
+            nn.Conv2d(1024, 512, 3, stride=2, padding=1),
+            nn.BatchNorm1d(512),
+            nn.ReLU()
+        )
+        self.fusion_conv1x1.apply(weights_init_kaiming)
+        self.fusion_conv3x3.apply(weights_init_kaiming)
 
     def forward(self, x):
         """
@@ -220,20 +220,8 @@ class BFE(nn.Module):
         ### update network.Fusion feature map
         local_feature = x
         fusion_feature = global_feature + local_feature
-        fusion_conv1x1 = nn.Sequential(
-            nn.Conv2d(2048, 1024, 1),
-            nn.BatchNorm1d(1024),
-            nn.ReLU()
-        )
-        fusion_conv3x3=nn.Sequential(
-            nn.Conv2d(1024, 512, 3, stride=2, padding=1),
-            nn.BatchNorm1d(512),
-            nn.ReLU()
-        )
-        fusion_conv1x1.apply((weights_init_kaiming))
-        fusion_conv3x3.apply((weights_init_kaiming))
-        x = fusion_conv1x1(fusion_feature)
-        x=fusion_conv3x3(x)       # [512,12,4]
+        x = self.fusion_conv1x1(fusion_feature)
+        x = self.fusion_conv3x3(x)       # [512,12,4]
         # 最大池化
         maxpool = nn.AdaptiveMaxPool2d((1, 1))
         x = maxpool(x).squeeze()  # [512,1，1]
