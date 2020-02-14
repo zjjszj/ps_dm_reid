@@ -18,32 +18,6 @@ import random
 #
 # print('x===',x)
 
-from torch import autograd
-from torch.autograd import Variable
-
-class Exp(autograd.Function):
-    @staticmethod
-    def forward(ctx, i,m):
-        result = i.exp()
-        ctx.save_for_backward(result,m)
-        return result
-    @staticmethod
-    def backward(ctx, grad_output):
-        grad_output=2
-        result, m= ctx.saved_tensors
-        m=m*2
-        print('m=====',m)
-        return grad_output * result,None
-
-
-a=torch.tensor(2.0,requires_grad=True)
-v=Exp.apply(a,torch.tensor(2))
-v.backward()
-print(a.grad)
-
-
-
-
-
-
-
+a=torch.tensor([2,3.2])
+b=torch.tensor([3,4],dtype=torch.float)
+print((a+b)/2)

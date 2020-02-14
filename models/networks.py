@@ -152,7 +152,7 @@ class BFE(nn.Module):
             resnet.layer2,  # res_conv3
             resnet.layer3,  # res_conv4
         )
-        self.res_part = nn.Sequential(  #layer4/res_conv5
+        self.res_part = nn.Sequential(
             Bottleneck(1024, 512, stride=1, downsample=nn.Sequential(
                 nn.Conv2d(1024, 2048, kernel_size=1, stride=1, bias=False),  #去掉了下采样
                 nn.BatchNorm2d(2048),
@@ -161,14 +161,15 @@ class BFE(nn.Module):
             Bottleneck(2048, 512),
         )
         self.res_part.load_state_dict(resnet.layer4.state_dict())
+        ##
         reduction = nn.Sequential(
-            nn.Conv2d(2048, 512, 1), 
-            nn.BatchNorm2d(512), 
+            nn.Conv2d(2048, 1024, 1),
+            nn.BatchNorm2d(1024),
             nn.ReLU()
         )
          # global branch
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.global_softmax = nn.Linear(512, num_classes) 
+        self.global_softmax = nn.Linear(512, num_classes)
         self.global_softmax.apply(weights_init_kaiming)
         self.global_reduction = copy.deepcopy(reduction)
         self.global_reduction.apply(weights_init_kaiming)
@@ -193,7 +194,7 @@ class BFE(nn.Module):
         :return: (prediction, triplet_losses, softmax_losses)
         """
         x = self.backbone(x)
-        x = self.res_part(x)
+        x = self.res_part(x)    #layer4/res_conv5
 
         predict = []
         triplet_features = []
@@ -202,8 +203,8 @@ class BFE(nn.Module):
         #global branch
         glob = self.global_avgpool(x)
         global_triplet_feature = self.global_reduction(glob).squeeze()   #[N, 512]
-        global_softmax_class = self.global_softmax(global_triplet_feature)
-        softmax_features.append(global_softmax_class)
+        ##global_softmax_class = self.global_softmax(global_triplet_feature)
+        ##softmax_features.append(global_softmax_class)
         triplet_features.append(global_triplet_feature)
         predict.append(global_triplet_feature)
        
@@ -217,9 +218,11 @@ class BFE(nn.Module):
         triplet_features.append(feature)
         softmax_features.append(softmax_feature)
         predict.append(feature)
-
+        ##融合全局和drop局部特征向量
+        fusion=(global_triplet_feature+feature)/2
         if self.training:
-            return triplet_features, softmax_features
+            ##return triplet_features, softmax_features
+            return fusion
         else:
             return torch.cat(predict, 1)
 
