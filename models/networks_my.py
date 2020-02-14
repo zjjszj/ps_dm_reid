@@ -220,15 +220,20 @@ class BFE(nn.Module):
         ### update network.Fusion feature map
         local_feature = x
         fusion_feature = global_feature + local_feature
-        fusion_conv = nn.Sequential(
+        fusion_conv1x1 = nn.Sequential(
             nn.Conv2d(2048, 1024, 1),
             nn.BatchNorm1d(1024),
-            nn.ReLU(),
+            nn.ReLU()
+        )
+        fusion_conv3x3=nn.Sequential(
             nn.Conv2d(1024, 512, 3, stride=2, padding=1),
             nn.BatchNorm1d(512),
             nn.ReLU()
         )
-        x = fusion_conv(fusion_feature)  # [512,12,4]
+        fusion_conv1x1.apply((weights_init_kaiming))
+        fusion_conv3x3.apply((weights_init_kaiming))
+        x = fusion_conv1x1(fusion_feature)
+        x=fusion_conv3x3(x)       # [512,12,4]
         # 最大池化
         maxpool = nn.AdaptiveMaxPool2d((1, 1))
         x = maxpool(x).squeeze()  # [512,1，1]
