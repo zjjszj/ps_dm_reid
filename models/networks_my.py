@@ -172,12 +172,12 @@ class BFE(nn.Module):
         ###myself
         self.fusion_conv1x1 = nn.Sequential(
             nn.Conv2d(2048, 1024, 1),
-            nn.BatchNorm1d(1024),
+            nn.BatchNorm2d(1024),
             nn.ReLU()
         )
         self.fusion_conv3x3 = nn.Sequential(
             nn.Conv2d(1024, 512, 3, stride=2, padding=1),
-            nn.BatchNorm1d(512),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
         self.fusion_conv1x1.apply(weights_init_kaiming)
