@@ -18,6 +18,9 @@ import random
 #
 # print('x===',x)
 
-a=torch.tensor([2,3.2])
-b=torch.tensor([3,4],dtype=torch.float)
-print((a+b)/2)
+a=[]
+b=(2,3,4)
+c=(5,6)
+a.append(b)
+a.append(c)
+print(a)

@@ -89,13 +89,14 @@ class cls_tripletTrainer:
         self.data = imgs.cuda()
         self.target = pids.cuda()
 
-    # def _forward(self):
-    #     score, feat = self.model(self.data)   #用于三元组损失和softmax损失
-    #     self.loss = self.criterion(score, feat, self.target)  #输出向量、输出得分、目标
-
     def _forward(self):
-        score = self.model(self.data)   #用于三元组损失和softmax损失
-        self.loss = self.criterion(score, self.target)  #输出向量、输出得分、目标
+        score, feat = self.model(self.data)   #用于三元组损失和softmax损失
+        self.loss = self.criterion(score, feat, self.target)  #输出向量、输出得分、目标
+
+    ##adding global and local vector.Using oim
+    # def _forward(self):
+    #     score = self.model(self.data)   #用于三元组损失和softmax损失
+    #     self.loss = self.criterion(score, self.target)  #输出向量、输出得分、目标
 
     def _backward(self):
         self.loss.backward()

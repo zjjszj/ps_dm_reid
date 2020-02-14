@@ -161,10 +161,9 @@ class BFE(nn.Module):
             Bottleneck(2048, 512),
         )
         self.res_part.load_state_dict(resnet.layer4.state_dict())
-        ##
         reduction = nn.Sequential(
-            nn.Conv2d(2048, 1024, 1),
-            nn.BatchNorm2d(1024),
+            nn.Conv2d(2048, 512, 1),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
          # global branch
@@ -203,8 +202,8 @@ class BFE(nn.Module):
         #global branch
         glob = self.global_avgpool(x)
         global_triplet_feature = self.global_reduction(glob).squeeze()   #[N, 512]
-        ##global_softmax_class = self.global_softmax(global_triplet_feature)
-        ##softmax_features.append(global_softmax_class)
+        global_softmax_class = self.global_softmax(global_triplet_feature)
+        softmax_features.append(global_softmax_class)
         triplet_features.append(global_triplet_feature)
         predict.append(global_triplet_feature)
        
@@ -212,17 +211,16 @@ class BFE(nn.Module):
         x = self.res_part2(x)
 
         x = self.batch_crop(x)
-        triplet_feature = self.part_maxpool(x).squeeze()
+        triplet_feature = self.part_maxpool(x).squeeze()  #[N, 2048]
         feature = self.reduction(triplet_feature)  #[N, 1024]
         softmax_feature = self.softmax(feature)
         triplet_features.append(feature)
         softmax_features.append(softmax_feature)
         predict.append(feature)
         ##融合全局和drop局部特征向量
-        fusion=(global_triplet_feature+feature)/2
+        ##fusion=(global_triplet_feature+feature)/2
         if self.training:
-            ##return triplet_features, softmax_features
-            return fusion
+            return triplet_features, softmax_features
         else:
             return torch.cat(predict, 1)
 
