@@ -218,8 +218,8 @@ class BFE(nn.Module):
         fusion_feature = global_feature + local_feature
         x = self.fusion_conv1x1(fusion_feature)
         x = self.fusion_conv3x3(x)       # [512,12,4]
-        # 最大池化
-        maxpool = nn.AdaptiveMaxPool2d((1, 1))
+        #平均池化 最大池化效果不好
+        maxpool = nn.AdaptiveAvgPool2d((1, 1))
         x = maxpool(x).squeeze()  # [512,1，1]
         ###end
 
