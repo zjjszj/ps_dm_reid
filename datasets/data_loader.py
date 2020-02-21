@@ -24,6 +24,8 @@ class ImageData(Dataset):
 
     def __getitem__(self, item):
         img, pid, camid = self.dataset[item]
+        # read_image方法放在ImageData里边而不是放在生成self.dataset的函数里边，
+        # 因为dataloader里可以设置多个worker从而节省时间
         img = read_image(img)
         if self.transform is not None:
             img = self.transform(img)
