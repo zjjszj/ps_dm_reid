@@ -24,7 +24,8 @@ from utils.LiftedStructure import LiftedStructureLoss
 from utils.DistWeightDevianceLoss import DistWeightBinDevianceLoss
 from utils.serialization import Logger, save_checkpoint
 from utils.transforms import TestTransform, TrainTransform
-
+#加载ps数据集
+import random
 
 def train(**kwargs):
     opt._parse(kwargs)
@@ -52,6 +53,9 @@ def train(**kwargs):
     pin_memory = True if use_gpu else False
 
     summary_writer = SummaryWriter(osp.join(opt.save_dir, 'tensorboard_log'))
+
+    ##加载训练数据集
+
 
     trainloader = DataLoader(
         ImageData(dataset.train, TrainTransform(opt.datatype)),
@@ -186,12 +190,12 @@ def train(**kwargs):
     # start training
     best_rank1 = opt.best_rank
     best_epoch = 0
+
     for epoch in range(start_epoch, opt.max_epoch):
         if opt.adjust_lr:
             adjust_lr(optimizer, epoch + 1)
+
         reid_trainer.train(epoch, trainloader)
-
-
         ##不执行评估代码 修改opt.eval_step的值
         # skip if not save model
         if opt.eval_step > 0 and (epoch + 1) % opt.eval_step == 0 or (epoch + 1) == opt.max_epoch:

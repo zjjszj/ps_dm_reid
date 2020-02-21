@@ -8,7 +8,22 @@ from torch import nn
 from torch.utils.data import DataLoader
 from utils.loss import euclidean_dist, hard_example_mining
 from utils.meters import AverageMeter
+#加载ps数据集
+import os.path as osp
+import _pickle as cPickle
+from datasets.process_ps_data import gt_roidb, img_process, read_pedeImage, TrainTransform
 
+
+def unpickle(file_path):
+    with open(file_path, 'rb') as f:
+        data = cPickle.load(f)
+    return data
+
+def gt_roidb():
+    cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录
+    if osp.isfile(cache_file):
+        roidb = unpickle(cache_file)
+        return roidb
 
 class cls_tripletTrainer:
     def __init__(self, opt, model, optimzier, criterion, summary_writer):
@@ -18,6 +33,31 @@ class cls_tripletTrainer:
         self.criterion = criterion
         self.summary_writer = summary_writer
 
+        self.roidb=gt_roidb()
+        self.indexs = [i for i in range(len(gt_roidb()))]
+
+    def get_batchData(self, i_batch, batch_size,indexs):
+        pedes_batch_x = []
+        pedes_batch_y = []
+        indexs_batch = [indexs[i] for i in range(i_batch * batch_size,
+            i_batch * batch_size + batch_size if i_batch * batch_size <= len(self.roidb) else len(self.roidb))]
+        print(indexs_batch)
+        for item in indexs_batch:
+            im_name = self.roidb[item]['im_name']
+            print(im_name)
+            boxes = self.roidb[item]['boxes']
+            gt_pids = self.roidb[item]['gt_pids']
+            pedes_x_Image, pedes_y = img_process(im_name, boxes, gt_pids)
+            pedes_x = TrainTransform()(pedes_x_Image)
+            pedes_batch_x.extend(pedes_x)
+            pedes_batch_y.extend(pedes_y)
+        pedes_batch_x = torch.stack(pedes_batch_x)
+        pedes_batch_y = torch.tensor(pedes_batch_y)
+        # print(pedes_batch_x.size())
+        # print(pedes_batch_y)
+        # print(pedes_batch_x)
+        return pedes_batch_x, pedes_batch_y
+
     def train(self, epoch, data_loader):
         self.model.train()
 
@@ -26,11 +66,24 @@ class cls_tripletTrainer:
         losses = AverageMeter()
 
         start = time.time()
-        for i, inputs in enumerate(data_loader):
+
+        #加载ps数据集
+        """
+        len(data_loader)都换成nums_batch
+        """
+        # 打乱顺序
+        random.shuffle(self.indexs)
+        batch_size = self.opt.train_batch
+        nums_batch=len(self.indexs)/batch_size
+        for i in range(nums_batch):
+            pedes_x, pedes_y=self.get_batchData(i,batch_size,self.indexs)
+            self.data=pedes_x.cuda()
+            self.target=pedes_y.cuda()
+        #for i, inputs in enumerate(data_loader):
             data_time.update(time.time() - start)
 
             # model optimizer
-            self._parse_data(inputs)
+            #self._parse_data(inputs)
             self._forward()
             self.optimizer.zero_grad()
             self._backward()
@@ -41,7 +94,8 @@ class cls_tripletTrainer:
             losses.update(self.loss.item())
 
             # tensorboard
-            global_step = epoch * len(data_loader) + i
+            #global_step = epoch * len(data_loader) + i
+            global_step = epoch * nums_batch + i
             self.summary_writer.add_scalar('loss', self.loss.item(), global_step)
             self.summary_writer.add_scalar('lr', self.optimizer.param_groups[0]['lr'], global_step)
 
@@ -53,7 +107,7 @@ class cls_tripletTrainer:
                       'Batch Time {:.3f} ({:.3f})\t'
                       'Data Time {:.3f} ({:.3f})\t'
                       'Loss {:.3f} ({:.3f})\t'
-                      .format(epoch, i + 1, len(data_loader),
+                      .format(epoch, i + 1, nums_batch,   #len(data_loader)
                               batch_time.val, batch_time.mean,
                               data_time.val, data_time.mean,
                               losses.val, losses.mean))
