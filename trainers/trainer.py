@@ -8,24 +8,6 @@ from torch import nn
 from torch.utils.data import DataLoader
 from utils.loss import euclidean_dist, hard_example_mining
 from utils.meters import AverageMeter
-#加载ps数据集
-import os.path as osp
-import _pickle as cPickle
-
-
-def unpickle(file_path):
-    with open(file_path, 'rb') as f:
-        data = cPickle.load(f)
-    return data
-
-def gt_roidb():
-    #cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录  用于pycharm
-    cache_file = '/kaggle/input/psdb-train-roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
-
-    if osp.isfile(cache_file):
-        roidb = unpickle(cache_file)
-        return roidb
-
 
 class cls_tripletTrainer:
     def __init__(self, opt, model, optimzier, criterion, summary_writer):
@@ -37,7 +19,7 @@ class cls_tripletTrainer:
 
     def train(self, epoch, data_loader,ps_manager):
         self.model.train()
-        
+
         batch_time = AverageMeter()
         data_time = AverageMeter()
         losses = AverageMeter()
