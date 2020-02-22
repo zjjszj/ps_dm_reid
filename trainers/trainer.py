@@ -155,6 +155,7 @@ class cls_tripletTrainer:
     def _forward(self):
         feature512= self.model(self.data)   #用于三元组损失和softmax损失
         self.loss = self.criterion(feature512, self.target)  #输出向量、输出得分、目标
+        print('self.loss=',self.loss)
     ###end
 
     ##adding global and local vector.Using oim
