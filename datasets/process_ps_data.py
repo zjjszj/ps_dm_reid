@@ -107,9 +107,7 @@ class ps_data_manager:
 
     def set_attr(self):
         self.roidb = gt_roidb()
-        self.pids2label = self.pids_to_label()
-        for k in self.pids2label:
-            print('pids==',k,"label==",self.pids2label[k])
+        #self.pids2label = self.pids_to_label()
         self.indexs = [i for i in range(len(self.roidb))]
 
     def pids_to_label(self):
@@ -158,5 +156,5 @@ class ps_data_manager:
                 boxe = boxes[i]
                 pede = image.crop(boxe)
                 pedes_x.append(pede)
-                pedes_y.append(self.pids2label[gt_pids[i]])
+                pedes_y.append(gt_pids[i])  #self.pids2label[gt_pids[i]]
         return pedes_x, pedes_y

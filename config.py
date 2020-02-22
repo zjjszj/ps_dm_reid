@@ -11,7 +11,7 @@ class DefaultConfig(object):
     datatype = 'person'
     mode = 'retrieval'
     # optimization options
-    loss = 'oimFusionMap'  #triplet  oim
+    loss = 'oim'  #triplet  oim  oimFusionMap
     optim = 'adam'
     max_epoch =400    #400
     train_batch = 32

@@ -162,13 +162,13 @@ class BFE(nn.Module):
         )
         self.res_part.load_state_dict(resnet.layer4.state_dict())
         reduction = nn.Sequential(
-            nn.Conv2d(2048, 512, 1),
-            nn.BatchNorm2d(512),
+            nn.Conv2d(2048, 1024, 1),   #512改为1024
+            nn.BatchNorm2d(1024),
             nn.ReLU()
         )
          # global branch
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.global_softmax = nn.Linear(512, num_classes)
+        self.global_softmax = nn.Linear(1024, num_classes)  #512改为1024
         self.global_softmax.apply(weights_init_kaiming)
         self.global_reduction = copy.deepcopy(reduction)
         self.global_reduction.apply(weights_init_kaiming)
@@ -218,9 +218,11 @@ class BFE(nn.Module):
         softmax_features.append(softmax_feature)
         predict.append(feature)
         ##融合全局和drop局部特征向量
-        ##fusion=(global_triplet_feature+feature)/2
+        fusion=(global_triplet_feature+feature)/2
         if self.training:
-            return triplet_features, softmax_features
+            #return triplet_features, softmax_features
+            return fusion
+
         else:
             return torch.cat(predict, 1)
 
