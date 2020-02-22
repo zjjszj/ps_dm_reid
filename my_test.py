@@ -20,7 +20,9 @@ import random
 #     x[:, i, sx:sx + rh, sy:sy + rw]=scope_aveg
 #
 # print('x===',x)
-
+class Test:
+    def __int__(self):
+        self.a=2
 
 from torch.utils.data import DataLoader
 if __name__ == '__main__':
@@ -57,7 +59,6 @@ if __name__ == '__main__':
     #     print('gt[im_name]===========', img['im_name'])
     #     print('gt[gt_pids]===========', img['gt_pids'])
 
-    a=[2,3]
-    b=torch.tensor(a)
-    print(b.type())
+    t=Test()
+    print(t.a)
 

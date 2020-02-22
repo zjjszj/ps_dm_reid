@@ -37,7 +37,7 @@ class cls_tripletTrainer:
 
     def train(self, epoch, data_loader,ps_manager):
         self.model.train()
-
+        
         batch_time = AverageMeter()
         data_time = AverageMeter()
         losses = AverageMeter()
