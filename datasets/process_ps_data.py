@@ -108,6 +108,9 @@ class ps_data_manager:
     def set_attr(self):
         self.roidb = gt_roidb()
         self.pids2label = self.pids_to_label()
+        for k,v in self.pids2label:
+            print('pids==',k)
+            print('label==',v)
         self.indexs = [i for i in range(len(self.roidb))]
 
     def pids_to_label(self):
