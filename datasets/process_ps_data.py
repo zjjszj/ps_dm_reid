@@ -67,7 +67,7 @@ def get_dataset():
     return roidb
 
 
-def img_process(im_name, boxes,gt_pids,img_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset\Image\SSM'):
+def img_process(im_name, boxes,gt_pids,img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
     pedes_x = []
     pedes_y = []
     image = read_pedeImage(osp.join(img_dir, im_name))

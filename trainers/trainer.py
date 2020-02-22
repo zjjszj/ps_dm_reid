@@ -44,10 +44,10 @@ class cls_tripletTrainer:
         pedes_batch_y = []
         indexs_batch = [indexs[i] for i in range(i_batch * batch_size,
             i_batch * batch_size + batch_size if i_batch * batch_size <= len(self.roidb) else len(self.roidb))]
-        print(indexs_batch)
+        #print(indexs_batch)
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
-            print(im_name)
+            #print(im_name)
             boxes = self.roidb[item]['boxes']
             gt_pids = self.roidb[item]['gt_pids']
             pedes_x_Image, pedes_y = img_process(im_name, boxes, gt_pids)
