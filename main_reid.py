@@ -58,6 +58,7 @@ def train(**kwargs):
 
     ##加载训练数据集
     ps_manager=ps_data_manager()
+    ps_manager.set_attr()
 
     trainloader = DataLoader(
         ImageData(dataset.train, TrainTransform(opt.datatype)),

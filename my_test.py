@@ -21,8 +21,10 @@ import random
 #
 # print('x===',x)
 class Test:
-    def __int__(self):
+
+    def set_attr(self):
         self.a=2
+
 
 from torch.utils.data import DataLoader
 if __name__ == '__main__':
@@ -60,5 +62,6 @@ if __name__ == '__main__':
     #     print('gt[gt_pids]===========', img['gt_pids'])
 
     t=Test()
+    t.set_attr()
     print(t.a)
 
