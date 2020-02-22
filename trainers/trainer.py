@@ -21,7 +21,7 @@ def unpickle(file_path):
 
 def gt_roidb():
     #cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录  用于pycharm
-    cache_file = '/kaggle/input/psdb_train_roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
+    cache_file = '/kaggle/input/psdb-train-roidb.pkl'  #项目的根目录   用于kaggle
 
     if osp.isfile(cache_file):
         roidb = unpickle(cache_file)
