@@ -105,8 +105,8 @@ class TrainTransform:
 class ps_data_manager:
 
     def set_attr(self):
-        self.pids2label = self.pids_to_label()
         self.roidb = gt_roidb()
+        self.pids2label = self.pids_to_label()
         self.indexs = [i for i in range(len(self.roidb))]
 
     def pids_to_label(self):
