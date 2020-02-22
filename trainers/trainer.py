@@ -36,7 +36,7 @@ class cls_tripletTrainer:
         self.summary_writer = summary_writer
 
         self.roidb=gt_roidb()
-        self.indexs = [i for i in range(len(gt_roidb()))]
+        self.indexs = [i for i in range(len(self.roidb))]
 
     def get_batchData(self, i_batch, batch_size,indexs):
         pedes_batch_x = []
