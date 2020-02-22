@@ -88,7 +88,7 @@ def train(**kwargs):
     )
 
     for i, inputs in enumerate(trainloader):
-        images, pids=inputs
+        images, pids,_=inputs
         print('pids===',pids)
 
     print('initializing model ...')
