@@ -152,5 +152,5 @@ class ps_data_manager:
                 boxe = boxes[i]
                 pede = image.crop(boxe)
                 pedes_x.append(pede)
-                pedes_y.append(gt_pids[i])
+                pedes_y.append(self.pids2label[gt_pids[i]])
         return pedes_x, pedes_y
