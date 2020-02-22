@@ -27,6 +27,7 @@ def gt_roidb():
         roidb = unpickle(cache_file)
         return roidb
 
+
 class cls_tripletTrainer:
     def __init__(self, opt, model, optimzier, criterion, summary_writer):
         self.opt = opt
