@@ -57,7 +57,7 @@ if __name__ == '__main__':
     #     print('gt[im_name]===========', img['im_name'])
     #     print('gt[gt_pids]===========', img['gt_pids'])
 
-    a=[2,]
-    print(torch.tensor(a))
-
+    a=[2,3]
+    b=torch.tensor(a)
+    print(b.type())
 
