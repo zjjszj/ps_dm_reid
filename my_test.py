@@ -57,9 +57,7 @@ if __name__ == '__main__':
     #     print('gt[im_name]===========', img['im_name'])
     #     print('gt[gt_pids]===========', img['gt_pids'])
 
-    indexs=[i for i in range(7)]
-    random.shuffle(indexs)
-    print(indexs)
-
+    a=[2,]
+    print(torch.tensor(a))
 
 
