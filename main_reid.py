@@ -87,6 +87,10 @@ def train(**kwargs):
         pin_memory=pin_memory
     )
 
+    for i, inputs in enumerate(trainloader):
+        images, pids=inputs
+        print('pids===',pids)
+
     print('initializing model ...')
     if opt.model_name == 'softmax' or opt.model_name == 'softmax_triplet':
         model = ResNetBuilder(dataset.num_train_pids, 1, True)
