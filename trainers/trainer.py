@@ -77,7 +77,7 @@ class cls_tripletTrainer:
         # 打乱顺序
         random.shuffle(self.indexs)
         batch_size = self.opt.train_batch
-        nums_batch=len(self.indexs)/batch_size
+        nums_batch=int(len(self.indexs)/batch_size)
         for i in range(nums_batch):
             pedes_x, pedes_y=self.get_batchData(i,batch_size,self.indexs)
             self.data=pedes_x.cuda()
