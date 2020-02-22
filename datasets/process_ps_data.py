@@ -118,10 +118,12 @@ class ps_data_manager:
         for i in range(len(self.roidb)):
             img = self.roidb[i]
             img_gt_pids = img['gt_pids']
+            print('im_name===',img['im_name'])
             for j in range(len(img_gt_pids)):
                 if img_gt_pids[j] != -1:
+                    print('img_gt_pids[j]===',img_gt_pids[j])
                     pids_container.add(img_gt_pids[j])
-        pid2label = {pid: label for pid, label in enumerate(pids_container)}
+        pid2label = {pid: label for label, pid in enumerate(pids_container)}
         return pid2label
 
     def get_batchData(self, i_batch, batch_size):
