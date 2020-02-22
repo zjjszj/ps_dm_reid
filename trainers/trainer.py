@@ -84,7 +84,8 @@ class cls_tripletTrainer:
             self.target=pedes_y.cuda()
         #for i, inputs in enumerate(data_loader):
             data_time.update(time.time() - start)
-
+            print('self.data.size()=',self.data.size())
+            print('self.target.size()=',self.target.size())
             # model optimizer
             #self._parse_data(inputs)
             self._forward()
