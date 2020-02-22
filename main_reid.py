@@ -197,7 +197,7 @@ def train(**kwargs):
         if opt.adjust_lr:
             adjust_lr(optimizer, epoch + 1)
 
-        reid_trainer.train(epoch, trainloader,ps_manager)
+        reid_trainer.train(epoch, trainloader, ps_manager)
         ##不执行评估代码 修改opt.eval_step的值
         # skip if not save model
         if opt.eval_step > 0 and (epoch + 1) % opt.eval_step == 0 or (epoch + 1) == opt.max_epoch:
