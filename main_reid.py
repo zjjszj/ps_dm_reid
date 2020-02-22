@@ -134,9 +134,9 @@ def train(**kwargs):
     elif opt.loss == 'weight':
         embedding_criterion = Margin()
     #oim
-    elif opt.loss=='oim':
-        embedding_criterion_global = OIMLoss(num_features=512, num_classes=751)
-        embedding_criterion_drop = OIMLoss(num_features=1024, num_classes=751)
+    # elif opt.loss=='oim':
+    #     embedding_criterion_global = OIMLoss(num_features=512, num_classes=751)
+    #     embedding_criterion_drop = OIMLoss(num_features=1024, num_classes=751)
     elif opt.loss=='oimFusionMap':
         embedding_criterion=OIMLoss(num_features=512,num_classes=751)
 
