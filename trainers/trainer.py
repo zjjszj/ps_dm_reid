@@ -11,7 +11,6 @@ from utils.meters import AverageMeter
 #加载ps数据集
 import os.path as osp
 import _pickle as cPickle
-from datasets.process_ps_data import gt_roidb, img_process, read_pedeImage, TrainTransform
 
 
 def unpickle(file_path):
@@ -36,38 +35,12 @@ class cls_tripletTrainer:
         self.criterion = criterion
         self.summary_writer = summary_writer
 
-        self.roidb=gt_roidb()
-        self.indexs = [i for i in range(len(self.roidb))]
-
-    def get_batchData(self, i_batch, batch_size,indexs):
-        pedes_batch_x = []
-        pedes_batch_y = []
-        indexs_batch = [indexs[i] for i in range(i_batch * batch_size,
-            i_batch * batch_size + batch_size if i_batch * batch_size <= len(self.roidb) else len(self.roidb))]
-        #print(indexs_batch)
-        for item in indexs_batch:
-            im_name = self.roidb[item]['im_name']
-            #print(im_name)
-            boxes = self.roidb[item]['boxes']
-            gt_pids = self.roidb[item]['gt_pids']
-            pedes_x_Image, pedes_y = img_process(im_name, boxes, gt_pids)
-            pedes_x = TrainTransform()(pedes_x_Image)
-            pedes_batch_x.extend(pedes_x)
-            pedes_batch_y.extend(pedes_y)
-        pedes_batch_x = torch.stack(pedes_batch_x)
-        pedes_batch_y = torch.tensor(pedes_batch_y,dtype=torch.long)
-        # print(pedes_batch_x.size())
-        # print(pedes_batch_y)
-        # print(pedes_batch_x)
-        return pedes_batch_x, pedes_batch_y
-
-    def train(self, epoch, data_loader):
+    def train(self, epoch, data_loader,ps_manager):
         self.model.train()
 
         batch_time = AverageMeter()
         data_time = AverageMeter()
         losses = AverageMeter()
-
         start = time.time()
 
         #加载ps数据集
@@ -75,17 +48,16 @@ class cls_tripletTrainer:
         len(data_loader)都换成nums_batch
         """
         # 打乱顺序
-        random.shuffle(self.indexs)
+        random.shuffle(ps_manager.indexs)
         batch_size = self.opt.train_batch
-        nums_batch=int(len(self.indexs)/batch_size)
+        nums_batch=int(len(ps_manager.indexs)/batch_size)
         for i in range(nums_batch):
-            pedes_x, pedes_y=self.get_batchData(i,batch_size,self.indexs)
+            pedes_x, pedes_y=ps_manager.get_batchData(i,batch_size,ps_manager.indexs)
             self.data=pedes_x.cuda()
             self.target=pedes_y.cuda()
         #for i, inputs in enumerate(data_loader):
             data_time.update(time.time() - start)
-            print('self.data=',self.data)
-            print('self.data.type()=',self.data.type())
+
             # model optimizer
             #self._parse_data(inputs)
             self._forward()

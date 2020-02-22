@@ -26,6 +26,8 @@ from utils.serialization import Logger, save_checkpoint
 from utils.transforms import TestTransform, TrainTransform
 #加载ps数据集
 import random
+from datasets.process_ps_data import ps_data_manager
+
 
 def train(**kwargs):
     opt._parse(kwargs)
@@ -55,7 +57,7 @@ def train(**kwargs):
     summary_writer = SummaryWriter(osp.join(opt.save_dir, 'tensorboard_log'))
 
     ##加载训练数据集
-
+    ps_manager=ps_data_manager()
 
     trainloader = DataLoader(
         ImageData(dataset.train, TrainTransform(opt.datatype)),
@@ -86,13 +88,6 @@ def train(**kwargs):
         batch_size=opt.test_batch, num_workers=opt.workers,
         pin_memory=pin_memory
     )
-
-    for i, inputs in enumerate(trainloader):
-        images, pids,_=inputs
-        print('images.type()===',images.type())
-        print('images=',images)
-        print('====================================================')
-        break
 
     print('initializing model ...')
     if opt.model_name == 'softmax' or opt.model_name == 'softmax_triplet':
@@ -202,7 +197,7 @@ def train(**kwargs):
         if opt.adjust_lr:
             adjust_lr(optimizer, epoch + 1)
 
-        reid_trainer.train(epoch, trainloader)
+        reid_trainer.train(epoch, trainloader,ps_manager)
         ##不执行评估代码 修改opt.eval_step的值
         # skip if not save model
         if opt.eval_step > 0 and (epoch + 1) % opt.eval_step == 0 or (epoch + 1) == opt.max_epoch:

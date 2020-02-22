@@ -67,35 +67,25 @@ def get_dataset():
     return roidb
 
 
-def img_process(im_name, boxes,gt_pids,img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
-    pedes_x = []
-    pedes_y = []
-    image = read_pedeImage(osp.join(img_dir, im_name))
-    for i in range(len(gt_pids)):
-        if gt_pids[i] != -1:
-            boxe = boxes[i]
-            pede = image.crop(boxe)
-            pedes_x.append(pede)
-            pedes_y.append(gt_pids[i])
-    return pedes_x, pedes_y
 
 
-class PS_Data(Dataset):
-    def __init__(self, dataset, transform):
-        self.dataset = dataset
-        self.transform = transform
 
-    def __getitem__(self, item):
-        im_name = self.dataset[item]['im_name']
-        boxes = self.dataset[item]['boxes']
-        gt_pids = self.dataset[item]['gt_pids']
-        pedes_x, pedes_y = img_process(im_name,boxes,gt_pids)
-        if self.transform is not None:
-            pedes_x = self.transform(pedes_x)
-        return pedes_x, pedes_y
-
-    def __len__(self):
-        return len(self.dataset)
+# class PS_Data(Dataset):
+#     def __init__(self, dataset, transform):
+#         self.dataset = dataset
+#         self.transform = transform
+#
+#     def __getitem__(self, item):
+#         im_name = self.dataset[item]['im_name']
+#         boxes = self.dataset[item]['boxes']
+#         gt_pids = self.dataset[item]['gt_pids']
+#         pedes_x, pedes_y = img_process(im_name,boxes,gt_pids)
+#         if self.transform is not None:
+#             pedes_x = self.transform(pedes_x)
+#         return pedes_x, pedes_y
+#
+#     def __len__(self):
+#         return len(self.dataset)
 
 
 class TrainTransform:
@@ -112,36 +102,55 @@ class TrainTransform:
         return ret
 
 
-def collate_wrapper(batch):
-    #处理批数据
-    print('batch=',len(batch))
+class ps_data_manager:
+    def __int__(self):
+        self.pids2label=self.pids_to_label()
+        self.roidb=gt_roidb()
+        self.indexs=[i for i in range(len(self.roidb))]
 
+    def pids_to_label(self):
+        # 制作label
+        pids_container = set()
+        for i in range(len(self.roidb)):
+            img = self.roidb[i]
+            img_gt_pids = img['gt_pids']
+            for j in range(len(img_gt_pids)):
+                if img_gt_pids[j] != -1:
+                    pids_container.add(img_gt_pids[j])
+        pid2label = {pid: label for pid, label in enumerate(pids_container)}
+        return pid2label
 
-trainloader = DataLoader(   #shuffle=True
-    PS_Data(get_dataset(), TrainTransform()),num_workers=0,batch_size=3,pin_memory=True, drop_last=True,
-    collate_fn=collate_wrapper,
-)
+    def get_batchData(self, i_batch, batch_size):
+        pedes_batch_x = []
+        pedes_batch_y = []
+        indexs_batch = [self.indexs[i] for i in range(i_batch * batch_size,
+                                                 i_batch * batch_size + batch_size if i_batch * batch_size <= len(
+                                                     self.roidb) else len(self.roidb))]
+        # print(indexs_batch)
+        for item in indexs_batch:
+            im_name = self.roidb[item]['im_name']
+            # print(im_name)
+            boxes = self.roidb[item]['boxes']
+            gt_pids = self.roidb[item]['gt_pids']
+            pedes_x_Image, pedes_y = self.img_process(im_name, boxes, gt_pids)
+            pedes_x = TrainTransform()(pedes_x_Image)
+            pedes_batch_x.extend(pedes_x)
+            pedes_batch_y.extend(pedes_y)
+        pedes_batch_x = torch.stack(pedes_batch_x)
+        pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
+        # print(pedes_batch_x.size())
+        # print(pedes_batch_y)
+        # print(pedes_batch_x)
+        return pedes_batch_x, pedes_batch_y
 
-
-
-
-def get_batchData(i_batch, batch_size):
-    pedes_batch_x=[]
-    pedes_batch_y=[]
-    indexs_batch=[indexs[i] for i in range(i_batch*batch_size,i_batch*batch_size+batch_size if i_batch*batch_size<=len(roidb) else len(roidb))]
-    print(indexs_batch)
-    for item in indexs_batch:
-        im_name = roidb[item]['im_name']
-        print(im_name)
-        boxes = roidb[item]['boxes']
-        gt_pids = roidb[item]['gt_pids']
-        pedes_x_Image, pedes_y =img_process(im_name, boxes, gt_pids)
-        pedes_x=TrainTransform()(pedes_x_Image)
-        pedes_batch_x.extend(pedes_x)
-        pedes_batch_y.extend(pedes_y)
-    pedes_batch_x=torch.stack(pedes_batch_x)
-    pedes_batch_y=torch.tensor(pedes_batch_y)
-    # print(pedes_batch_x.size())
-    # print(pedes_batch_y)
-    # print(pedes_batch_x)
-    return pedes_batch_x, pedes_batch_y
+    def img_process(self, im_name, boxes, gt_pids, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+        pedes_x = []
+        pedes_y = []
+        image = read_pedeImage(osp.join(img_dir, im_name))
+        for i in range(len(gt_pids)):
+            if gt_pids[i] != -1:
+                boxe = boxes[i]
+                pede = image.crop(boxe)
+                pedes_x.append(pede)
+                pedes_y.append(gt_pids[i])
+        return pedes_x, pedes_y
