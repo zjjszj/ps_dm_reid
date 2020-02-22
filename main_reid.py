@@ -87,9 +87,12 @@ def train(**kwargs):
         pin_memory=pin_memory
     )
 
-    # for i, inputs in enumerate(trainloader):
-    #     images, pids,_=inputs
-    #     print('pids===',pids)
+    for i, inputs in enumerate(trainloader):
+        images, pids,_=inputs
+        print('images.type()===',images.type())
+        print('images=',images)
+        print('====================================================')
+        break
 
     print('initializing model ...')
     if opt.model_name == 'softmax' or opt.model_name == 'softmax_triplet':
