@@ -61,7 +61,5 @@ if __name__ == '__main__':
     #     print('gt[im_name]===========', img['im_name'])
     #     print('gt[gt_pids]===========', img['gt_pids'])
 
-    t=Test()
-    t.set_attr()
-    print(t.a)
+    print(2,'d',3)
 
