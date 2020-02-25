@@ -44,15 +44,15 @@ def unpickle(file_path):
 
 
 def gt_train_roidb():
-    cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录  用于pycharm
-    #cache_file = '/kaggle/input/psdb-train-roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
+    #cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录  用于pycharm
+    cache_file = '/kaggle/input/psdb-train-roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
     if osp.isfile(cache_file):
         roidb = unpickle(cache_file)
         return roidb
 
 def gt_test_roidb():
-    cache_file = 'E:/data/cache/psdb_test_gt_roidb.pkl'  #项目的根目录  用于pycharm
-    #cache_file = '/kaggle/input/psdb-train-roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
+    #cache_file = 'E:/data/cache/psdb_test_gt_roidb.pkl'  #项目的根目录  用于pycharm
+    cache_file = '/kaggle/input/psdb-test-roidb/psdb_test_gt_roidb.pkl'  #项目的根目录   用于kaggle
     if osp.isfile(cache_file):
         roidb = unpickle(cache_file)
         return roidb
@@ -67,15 +67,6 @@ def read_pedeImage(img_path):
             print("IOError incurred when reading '{}'. Will redo. Don't worry. Just chill.".format(img_path))
             pass
     return img
-
-
-def get_dataset():
-    roidb=gt_roidb()
-    return roidb
-
-
-
-
 
 # class PS_Data(Dataset):
 #     def __init__(self, dataset, transform):
