@@ -159,7 +159,7 @@ class ps_data_manager:
         # print(pedes_batch_x.size())
         # print(pedes_batch_y)
         # print(pedes_batch_x)
-        return pedes_batch_x, pedes_batch_y.reshape(len(pedes_batch_y))
+        return pedes_batch_x, pedes_batch_y
 
     def img_process(self, im_name, boxes, gt_pids, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
         pedes_x = []

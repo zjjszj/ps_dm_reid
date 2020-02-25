@@ -13,7 +13,7 @@ class DefaultConfig(object):
     # optimization options
     loss = 'oim'  #triplet  oim  oimFusionMap
     optim = 'adam'
-    max_epoch =1    #400
+    max_epoch =50    #400
     train_batch = 32
     test_batch = 32
     adjust_lr = False
@@ -37,7 +37,7 @@ class DefaultConfig(object):
     # miscs
     print_freq = 30
     #评估并保存的伦数
-    eval_step = 5000   #不评估，执行测试
+    eval_step = 20   #不评估，执行测试
     save_dir = './pytorch-ckpt/market'
     workers = 4
     start_epoch = 0

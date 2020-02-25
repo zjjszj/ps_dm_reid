@@ -28,7 +28,7 @@ class Test:
 from torchvision.models.resnet import Bottleneck, resnet50
 
 if __name__ == '__main__':
-    a=torch.tensor([[2],[3]])
-
-    print(a.reshape(len(a)))
-
+    pred=torch.tensor([[1],[2]])
+    target=torch.tensor([1,2])
+    a=pred.eq(target.view_as(pred)).sum().item()
+    print(a)
