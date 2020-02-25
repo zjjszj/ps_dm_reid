@@ -28,7 +28,7 @@ class Test:
 from torchvision.models.resnet import Bottleneck, resnet50
 
 if __name__ == '__main__':
-    a=torch.tensor([2])
-    print(a.item())
-    print(a)
+    a=torch.tensor([[2],[3]])
+
+    print(a.reshape(len(a)))
 
