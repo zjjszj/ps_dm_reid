@@ -101,6 +101,7 @@ class TrainTransform:
 
 def ps_test(model, ps_manager, nums): #nums是图像的个数
     ps_manager.roidb=gt_test_roidb()
+    ps_manager.indexs = [i for i in range(len(ps_manager.roidb))]
     model.eval()
     correct = 0
     with torch.no_grad():
@@ -114,6 +115,7 @@ def ps_test(model, ps_manager, nums): #nums是图像的个数
     rank1 = 100. * correct / nums
     print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, nums, rank1))
     ps_manager.roidb=gt_train_roidb()
+    ps_manager.indexs = [i for i in range(len(ps_manager.roidb))]
     return rank1
 
 class ps_data_manager:
