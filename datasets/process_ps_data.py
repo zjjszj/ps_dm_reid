@@ -43,13 +43,19 @@ def unpickle(file_path):
     return data
 
 
-def gt_roidb():
-    #cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录  用于pycharm
-    cache_file = '/kaggle/input/psdb-train-roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
+def gt_train_roidb():
+    cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录  用于pycharm
+    #cache_file = '/kaggle/input/psdb-train-roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
     if osp.isfile(cache_file):
         roidb = unpickle(cache_file)
         return roidb
 
+def gt_test_roidb():
+    cache_file = 'E:/data/cache/psdb_test_gt_roidb.pkl'  #项目的根目录  用于pycharm
+    #cache_file = '/kaggle/input/psdb-train-roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
+    if osp.isfile(cache_file):
+        roidb = unpickle(cache_file)
+        return roidb
 
 def read_pedeImage(img_path):
     got_img = False
@@ -88,6 +94,22 @@ def get_dataset():
 #     def __len__(self):
 #         return len(self.dataset)
 
+def ps_test(model, ps_manager, nums): #nums是图像的个数
+    ps_manager.roidb=gt_test_roidb()
+    model.eval()
+    correct = 0
+    with torch.no_grad():
+        for data, target, _ in ps_manager.get_batchData(0,nums):
+            data=data.cuda()
+            output = model(data).cpu()
+            # get the index of the max log-probability
+            pred = output.max(1, keepdim=True)[1]
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+    rank1 = 100. * correct / nums
+    print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, nums, rank1))
+    ps_manager.roidb=gt_train_roidb()
+    return rank1
 
 class TrainTransform:
     def __call__(self, x):
@@ -106,7 +128,7 @@ class TrainTransform:
 class ps_data_manager:
 
     def set_attr(self):
-        self.roidb = gt_roidb()
+        self.roidb = gt_train_roidb()
         #self.pids2label = self.pids_to_label()
         self.indexs = [i for i in range(len(self.roidb))]
 
@@ -116,10 +138,8 @@ class ps_data_manager:
         for i in range(len(self.roidb)):
             img = self.roidb[i]
             img_gt_pids = img['gt_pids']
-            print('im_name===',img['im_name'])
             for j in range(len(img_gt_pids)):
                 if img_gt_pids[j] != -1:
-                    print('img_gt_pids[j]===',img_gt_pids[j])
                     pids_container.add(img_gt_pids[j])
         pid2label = {pid: label for label, pid in enumerate(pids_container)}
         return pid2label

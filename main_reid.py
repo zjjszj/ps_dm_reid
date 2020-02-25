@@ -26,7 +26,7 @@ from utils.serialization import Logger, save_checkpoint
 from utils.transforms import TestTransform, TrainTransform
 #加载ps数据集
 import random
-from datasets.process_ps_data import ps_data_manager
+from datasets.process_ps_data import ps_data_manager, ps_test
 
 
 def train(**kwargs):
@@ -196,18 +196,41 @@ def train(**kwargs):
     best_rank1 = opt.best_rank
     best_epoch = 0
 
+
+    #ps_test
+    print('ps_test begin!==================')
+    from datasets.process_ps_data import ps_test
+    ps_test(model,ps_manager,100)
+    print('ps_test end!==================')
+
     for epoch in range(start_epoch, opt.max_epoch):
         if opt.adjust_lr:
             adjust_lr(optimizer, epoch + 1)
 
         reid_trainer.train(epoch, trainloader, ps_manager)
-        ##不执行评估代码 修改opt.eval_step的值
+        # # skip if not save model
+        # if opt.eval_step > 0 and (epoch + 1) % opt.eval_step == 0 or (epoch + 1) == opt.max_epoch:
+        #     if opt.mode == 'class':
+        #         rank1 = test(model, queryloader)
+        #     else:
+        #         rank1 = reid_evaluator.evaluate(queryloader, galleryloader, queryFliploader, galleryFliploader)
+        #     is_best = rank1 > best_rank1
+        #     if is_best:
+        #         best_rank1 = rank1
+        #         best_epoch = epoch + 1
+        #
+        #     if use_gpu:
+        #         state_dict = model.module.state_dict()
+        #     else:
+        #         state_dict = model.state_dict()
+        #     save_checkpoint({'state_dict': state_dict, 'epoch': epoch + 1},
+        #         is_best=is_best, save_dir=opt.save_dir,
+        #         filename='checkpoint_ep' + str(epoch + 1) + '.pth.tar')
+
         # skip if not save model
         if opt.eval_step > 0 and (epoch + 1) % opt.eval_step == 0 or (epoch + 1) == opt.max_epoch:
-            if opt.mode == 'class':
-                rank1 = test(model, queryloader) 
-            else:
-                rank1 = reid_evaluator.evaluate(queryloader, galleryloader, queryFliploader, galleryFliploader)
+
+            rank1=ps_test(model, ps_manager, nums=100)  #nums为图像个数
             is_best = rank1 > best_rank1
             if is_best:
                 best_rank1 = rank1
@@ -217,9 +240,9 @@ def train(**kwargs):
                 state_dict = model.module.state_dict()
             else:
                 state_dict = model.state_dict()
-            save_checkpoint({'state_dict': state_dict, 'epoch': epoch + 1}, 
-                is_best=is_best, save_dir=opt.save_dir, 
-                filename='checkpoint_ep' + str(epoch + 1) + '.pth.tar')
+            save_checkpoint({'state_dict': state_dict, 'epoch': epoch + 1},
+                            is_best=is_best, save_dir=opt.save_dir,
+                            filename='checkpoint_ep' + str(epoch + 1) + '.pth.tar')
 
     print('Best rank-1 {:.1%}, achived at epoch {}'.format(best_rank1, best_epoch))
 

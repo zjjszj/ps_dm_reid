@@ -103,13 +103,17 @@ class psdb(imdb):
 
         def _set_box_pid(boxes, box, pids, pid):
             for i in range(boxes.shape[0]):
+                #print('box===',box)
+                #print('boxes[i]===',boxes[i])
                 if np.all(boxes[i] == box):
+                    #print('pid====',pid)
                     pids[i] = pid
                     return
             print('Warning: person {} box {} cannot find in Images'.format(pid, box))
 
         # Load all the train / test persons and label their pids from 0 to N-1
         # Assign pid = -1 for unlabeled background people
+
         if self._image_set == 'train':
             print('train=============================================')
             train = loadmat(osp.join(self._root_dir,
@@ -473,18 +477,17 @@ class psdb(imdb):
 if __name__ == '__main__':
     #from datasets.psdb import psdb
     d = psdb('train')
-    train = d.gt_roidb()    #len(gt_roidb)=11206  训练图片的个数
+    d.gt_roidb()
     # print(len(train))
     # d=psdb('test',root_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset')
     # test=d.gt_roidb()
     # print(len(test))        print(img['im_name'])x
 
-
-    for img in train:
-        print(img['im_name'])
-        print(img['gt_pids'])
-        print('====================================================')
-
+    #print(test)
+    # for img in test:
+    #     print(img['im_name'])
+    #     print(img['gt_pids'])
+    #     print('====================================================')
 
 
     #from IPython import embed; embed()       #调式时使用

@@ -39,9 +39,6 @@ class cls_tripletTrainer:
             self.target=pedes_y.cuda()
         #for i, inputs in enumerate(data_loader):
             data_time.update(time.time() - start)
-            print('self.data.size()=',self.data.size())
-            print('self.target==',self.target)
-            print('self.target.size()==',self.target.size())
             # model optimizer
             #self._parse_data(inputs)
             self._forward()
@@ -112,7 +109,6 @@ class cls_tripletTrainer:
     def _forward(self):
         feature512= self.model(self.data)   #用于三元组损失和softmax损失
         self.loss = self.criterion(feature512, self.target)  #输出向量、输出得分、目标
-        print('self.loss=',self.loss)
     ###end
 
     ##adding global and local vector.Using oim

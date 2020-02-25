@@ -1,6 +1,6 @@
 import torch
 import random
-
+from datasets.process_ps_data import ps_data_manager
 
 
 
@@ -25,13 +25,9 @@ class Test:
     def set_attr(self):
         self.a=2
 
-
-from torch.utils.data import DataLoader
+import numpy as np
 if __name__ == '__main__':
-
-    a=set()
-    a.add('one')
-    a.add('two')
-    pid2label = {pid: label for label, pid in enumerate(a)}
-    for i,j in enumerate(pid2label):
-        print('i=',i,'j=',j)
+    p=ps_data_manager()
+    p.set_attr()
+    p.roidb=2
+    print(p.roidb)
