@@ -25,9 +25,10 @@ class Test:
     def set_attr(self):
         self.a=2
 
-import numpy as np
+from torchvision.models.resnet import Bottleneck, resnet50
+
 if __name__ == '__main__':
-    p=ps_data_manager()
-    p.set_attr()
-    p.roidb=2
-    print(p.roidb)
+    a=torch.tensor([2])
+    print(a.item())
+    print(a)
+

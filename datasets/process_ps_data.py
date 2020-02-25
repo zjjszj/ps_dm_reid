@@ -110,6 +110,8 @@ def ps_test(model, ps_manager, nums): #nums是图像的个数
         output = model(data).cpu()
         # get the index of the max log-probability
         pred = output.max(1, keepdim=True)[1]
+        print('pred=====',pred)
+        print('target========',target)
         correct += pred.eq(target.view_as(pred)).sum().item()
 
     rank1 = 100. * correct / nums
