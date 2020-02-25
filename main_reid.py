@@ -192,6 +192,11 @@ def train(**kwargs):
         for p in optimizer.param_groups:
             p['lr'] = lr
 
+    for i, inputs in enumerate(trainloader):
+        data, target=inputs
+        print('target.size()====',target.size())
+        return
+        
     # start training
     best_rank1 = opt.best_rank
     best_epoch = 0
