@@ -104,12 +104,12 @@ def ps_test(model, ps_manager, nums): #nums是图像的个数
     model.eval()
     correct = 0
     with torch.no_grad():
-        for data, target in ps_manager.get_batchData(0,nums):
-            data=data.cuda()
-            output = model(data).cpu()
-            # get the index of the max log-probability
-            pred = output.max(1, keepdim=True)[1]
-            correct += pred.eq(target.view_as(pred)).sum().item()
+        data, target=ps_manager.get_batchData(0,nums)
+        data=data.cuda()
+        output = model(data).cpu()
+        # get the index of the max log-probability
+        pred = output.max(1, keepdim=True)[1]
+        correct += pred.eq(target.view_as(pred)).sum().item()
 
     rank1 = 100. * correct / nums
     print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, nums, rank1))
