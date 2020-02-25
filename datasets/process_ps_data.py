@@ -85,23 +85,6 @@ def read_pedeImage(img_path):
 #     def __len__(self):
 #         return len(self.dataset)
 
-def ps_test(model, ps_manager, nums): #nums是图像的个数
-    ps_manager.roidb=gt_test_roidb()
-    model.eval()
-    correct = 0
-    with torch.no_grad():
-        for data, target, _ in ps_manager.get_batchData(0,nums):
-            data=data.cuda()
-            output = model(data).cpu()
-            # get the index of the max log-probability
-            pred = output.max(1, keepdim=True)[1]
-            correct += pred.eq(target.view_as(pred)).sum().item()
-
-    rank1 = 100. * correct / nums
-    print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, nums, rank1))
-    ps_manager.roidb=gt_train_roidb()
-    return rank1
-
 class TrainTransform:
     def __call__(self, x):
         ret=[]
@@ -115,6 +98,23 @@ class TrainTransform:
             ret.append(pede)
         return ret
 
+
+def ps_test(model, ps_manager, nums): #nums是图像的个数
+    ps_manager.roidb=gt_test_roidb()
+    model.eval()
+    correct = 0
+    with torch.no_grad():
+        for data, target in ps_manager.get_batchData(0,nums):
+            data=data.cuda()
+            output = model(data).cpu()
+            # get the index of the max log-probability
+            pred = output.max(1, keepdim=True)[1]
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+    rank1 = 100. * correct / nums
+    print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, nums, rank1))
+    ps_manager.roidb=gt_train_roidb()
+    return rank1
 
 class ps_data_manager:
 
@@ -139,8 +139,7 @@ class ps_data_manager:
         pedes_batch_x = []
         pedes_batch_y = []
         indexs_batch = [self.indexs[i] for i in range(i_batch * batch_size,
-                                                 i_batch * batch_size + batch_size if i_batch * batch_size <= len(
-                                                     self.roidb) else len(self.roidb))]
+            i_batch * batch_size + batch_size if i_batch * batch_size <= len(self.roidb) else len(self.roidb))]
         # print(indexs_batch)
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
