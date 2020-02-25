@@ -196,13 +196,6 @@ def train(**kwargs):
     best_rank1 = opt.best_rank
     best_epoch = 0
 
-
-    #ps_test
-    print('ps_test begin!==================')
-    from datasets.process_ps_data import ps_test
-    ps_test(model,ps_manager,100)
-    print('ps_test end!==================')
-
     for epoch in range(start_epoch, opt.max_epoch):
         if opt.adjust_lr:
             adjust_lr(optimizer, epoch + 1)
