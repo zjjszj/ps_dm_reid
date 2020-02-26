@@ -144,7 +144,7 @@ class ps_data_manager:
         pedes_batch_y = []
         indexs_batch = [self.indexs[i] for i in range(i_batch * batch_size,
             i_batch * batch_size + batch_size if i_batch * batch_size <= len(self.roidb) else len(self.roidb))]
-        # print(indexs_batch)
+        print('indexs_batch===',indexs_batch)
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
             # print(im_name)
