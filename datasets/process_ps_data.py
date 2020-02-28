@@ -183,7 +183,7 @@ class ps_data_manager:
 
     def get_query_inputs(self):
         q_Image=[]
-        test = psdb('test')
+        test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         probes = test.probes  #[(img_path,box)...]
         for item in probes:
             img_path=item[0]
@@ -198,8 +198,7 @@ class ps_data_manager:
     def get_gallery_det_inputs(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
         g_det=[]
         g_Image=[]
-        test = psdb('test')
-        test_roidb=test.gt_roidb()
+        test_roidb=gt_test_roidb()
         for img in test_roidb:
             boxes=img['boxes']
             im_name=img['im_name']
@@ -215,7 +214,7 @@ class ps_data_manager:
         return g_det, g_tensor
 
     def evaluate(self, model):
-        test = psdb('test')
+        test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         q_inputs=self.get_query_inputs()
         g_det, g_inputs=self.get_gallery_det_inputs()
         q_feat=model(q_inputs.cuda())
