@@ -29,6 +29,7 @@ class imdb(object):
       self._classes = []
     else:
       self._classes = classes
+    self._probes = []
     self._image_index = []
     self._obj_proposer = 'gt'
     self._roidb = None
@@ -86,6 +87,10 @@ class imdb(object):
   @property
   def num_images(self):
     return len(self.image_index)
+
+  @property
+  def probes(self):
+    return self._probes
 
   def image_path_at(self, i):
     raise NotImplementedError

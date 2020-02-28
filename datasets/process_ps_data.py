@@ -9,6 +9,7 @@ from torchvision import transforms as T
 import random
 from torch.utils.data import DataLoader
 import torch
+from datasets.psdb import psdb
 
 class Cutout(object):
     def __init__(self, probability=0.5, size=64, mean=[0.4914, 0.4822, 0.4465]):
@@ -86,7 +87,7 @@ def read_pedeImage(img_path):
 #         return len(self.dataset)
 
 class TrainTransform:
-    def __call__(self, x):
+    def __call__(self, x):  #x:[pede,...]
         ret=[]
         for pede in x:
             pede = T.Resize((128, 64))(pede)
@@ -98,7 +99,7 @@ class TrainTransform:
             ret.append(pede)
         return ret
 
-
+#错误的方法，使用的是test的数据
 def ps_test(model, ps_manager, nums): #nums是图像的个数
     ps_manager.roidb=gt_test_roidb()
     ps_manager.indexs = [i for i in range(len(ps_manager.roidb))]
@@ -144,7 +145,6 @@ class ps_data_manager:
         pedes_batch_y = []
         indexs_batch = [self.indexs[i] for i in range(i_batch * batch_size,
             i_batch * batch_size + batch_size if i_batch * batch_size <= len(self.roidb) else len(self.roidb))]
-        print('indexs_batch===',indexs_batch)
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
             # print(im_name)
@@ -162,6 +162,14 @@ class ps_data_manager:
         return pedes_batch_x, pedes_batch_y
 
     def img_process(self, im_name, boxes, gt_pids, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+        """
+
+        :param im_name: image name
+        :param boxes: all boxes per img
+        :param gt_pids: all pids per img
+        :param img_dir:
+        :return: [Image type pede...], [pede label...]
+        """
         pedes_x = []
         pedes_y = []
         image = read_pedeImage(osp.join(img_dir, im_name))
@@ -172,3 +180,45 @@ class ps_data_manager:
                 pedes_x.append(pede)
                 pedes_y.append(gt_pids[i])  #self.pids2label[gt_pids[i]]
         return pedes_x, pedes_y
+
+    def get_query_inputs(self):
+        q_Image=[]
+        test = psdb('test')
+        probes = test.probes  #[(img_path,box)...]
+        for item in probes:
+            img_path=item[0]
+            box=item[1]
+            img=read_pedeImage(img_path)
+            pede=img.crop(box)
+            q_Image.extend(pede)
+        q_tensor=TrainTransform()(q_Image)
+        q_tensor=torch.stack(q_tensor)
+        return q_tensor
+
+    def get_gallery_det_inputs(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+        g_det=[]
+        g_Image=[]
+        test = psdb('test')
+        test_roidb=test.gt_roidb()
+        for img in test_roidb:
+            boxes=img['boxes']
+            im_name=img['im_name']
+            #boxes = np.hstack((a, np.ones((a.shape[0], 1))))
+            g_det.append(boxes)
+            image=read_pedeImage(osp.join(img_dir, im_name))
+            for box in boxes:
+                pede_Image=image.crop(box)
+                g_Image.append(pede_Image)
+
+        g_tensor = TrainTransform()(g_Image)
+        g_tensor=torch.stack(g_tensor)
+        return g_det, g_tensor
+
+    def evaluate(self, model):
+        test = psdb('test')
+        q_inputs=self.get_query_inputs()
+        g_det, g_inputs=self.get_gallery_det_inputs()
+        q_feat=model(q_inputs.cuda())
+        g_feat=model(g_inputs.cuda())
+        test.evaluate_search(g_det,g_feat,q_feat)
+

@@ -1,6 +1,5 @@
 import torch
 import random
-from datasets.process_ps_data import ps_data_manager
 
 
 
@@ -26,9 +25,17 @@ class Test:
         self.a=2
 
 from torchvision.models.resnet import Bottleneck, resnet50
+import torch
+import numpy as np
+from datasets.psdb import psdb
 
 if __name__ == '__main__':
-    pred=torch.tensor([[1],[2]])
-    target=torch.tensor([1,2])
-    a=pred.eq(target.view_as(pred)).sum().item()
-    print(a)
+    # det=np.array([[1,2,3,4,5],[1,2,3,4,5]])
+    # gallery_feat=np.array([[0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5]])
+    # test=psdb('test')
+    # probes=test.probes
+    # print(probes)
+
+    a=np.array([[1,2],[3,4]])
+    b=np.hstack((a,np.ones((a.shape[0],1))))
+    print(b)

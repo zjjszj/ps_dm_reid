@@ -37,7 +37,7 @@ class DefaultConfig(object):
     # miscs
     print_freq = 30
     #评估并保存的伦数
-    eval_step = 1   #不评估，执行测试
+    eval_step = 1
     save_dir = './pytorch-ckpt/market'
     workers = 4
     start_epoch = 0

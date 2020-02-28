@@ -103,10 +103,7 @@ class psdb(imdb):
 
         def _set_box_pid(boxes, box, pids, pid):
             for i in range(boxes.shape[0]):
-                #print('box===',box)
-                #print('boxes[i]===',boxes[i])
                 if np.all(boxes[i] == box):
-                    #print('pid====',pid)
                     pids[i] = pid
                     return
             print('Warning: person {} box {} cannot find in Images'.format(pid, box))
@@ -134,12 +131,14 @@ class psdb(imdb):
             for index, item in enumerate(test):
                 # query
                 im_name = str(item['Query'][0,0][0][0])
+                print('query..im_name===',im_name)
                 box = item['Query'][0,0][1].squeeze().astype(np.int32)
                 _set_box_pid(name_to_boxes[im_name], box,
                              name_to_pids[im_name], index)
                 # gallery
                 gallery = item['Gallery'].squeeze()
                 for im_name, box, __ in gallery:
+                    print('gallery...im_name===',im_name)
                     im_name = str(im_name[0])
                     if box.size == 0: break
                     box = box.squeeze().astype(np.int32)
@@ -246,7 +245,7 @@ class psdb(imdb):
         if not labeled_only: print( '  ap = {:.2%}'.format(ap))
 
     def evaluate_search(self, gallery_det, gallery_feat, probe_feat,
-                        det_thresh=0.5, gallery_size=100, dump_json=None):
+                        det_thresh=0.5, gallery_size=50, dump_json=None):
         """
         gallery_det (list of ndarray): n_det x [x1, x2, y1, y2, score] per image
         gallery_feat (list of ndarray): n_det x D features per image
@@ -261,6 +260,8 @@ class psdb(imdb):
         assert self.num_images == len(gallery_feat)
         assert len(self.probes) == len(probe_feat)
 
+
+
         # TODO: support evaluation on training split
         use_full_set = gallery_size == -1
         fname = 'TestG{}'.format(gallery_size if not use_full_set else 50)
@@ -271,8 +272,11 @@ class psdb(imdb):
         name_to_det_feat = {}
         for name, det, feat in zip(self._image_index,
                                    gallery_det, gallery_feat):
-            scores = det[:, 4].ravel()
-            inds = np.where(scores >= det_thresh)[0]
+            #使用gt
+            # scores = det[:, 4].ravel()
+            # inds = np.where(scores >= det_thresh)[0]
+            inds=[i for i in range(len(det))]
+
             if len(inds) > 0:
                 name_to_det_feat[name] = (det[inds], feat[inds])
 
@@ -280,7 +284,7 @@ class psdb(imdb):
         accs = []
         topk = [1, 5, 10]
         ret = {'image_root': self._data_path, 'results': []}
-        for i in range(len(self.probes)):
+        for i in range(len(self.probes)):              #1
             y_true, y_score = [], []
             imgs, rois = [], []
             count_gt, count_tp = 0, 0
@@ -383,6 +387,7 @@ class psdb(imdb):
                 os.makedirs(osp.dirname(dump_json))
             with open(dump_json, 'w') as f:
                 json.dump(ret, f)
+        return accs[1]
 
     def evaluate_cls(self, detections, pid_ranks, pid_labels,
                      det_thresh=0.5):
@@ -476,15 +481,16 @@ class psdb(imdb):
 
 if __name__ == '__main__':
     #from datasets.psdb import psdb
-    d = psdb('train')
-    d.gt_roidb()
-    # print(len(train))
+
+    #d = psdb('test')
+    #roidb=d.gt_roidb()
+
+    # print(len(roidb))
     # d=psdb('test',root_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset')
     # test=d.gt_roidb()
-    # print(len(test))        print(img['im_name'])x
+    #print(len(roidb))
 
-    #print(test)
-    # for img in test:
+    # for img in roidb:
     #     print(img['im_name'])
     #     print(img['gt_pids'])
     #     print('====================================================')
@@ -492,4 +498,26 @@ if __name__ == '__main__':
 
     #from IPython import embed; embed()       #调式时使用
 
-
+    #求query和gallery
+    #test = loadmat(osp.join(r'F:datasets/reid/CUHK-SYSU_nomacosx/dataset','annotation/test/train_test/TestG50.mat'))
+    #test = test['TestG50'].squeeze()
+    # for i in range(6978):
+    #     # Ignore the probe image
+    #     probe_imname = str(test['Query'][i]['imname'][0,0][0])
+    #     print('probe_imname==',probe_imname)
+    #     # probe_roi = protoc['Query'][i]['idlocate'][0,0][0].astype(np.int32)
+    #     # probe_roi[2:] += probe_roi[:2]
+    #     # 1. Go through the gallery samples defined by the protocol
+    #     for item in test['Gallery'][i].squeeze():
+    #         gallery_imname = str(item[0][0])
+    #         print('gallery_imname===',gallery_imname)
+    #test evaluate_search()
+    # gallery_det=np.array([[1,2,3,4,5],[1,2,3,4,5]])
+    # gallery_feat=np.array([[0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5]])
+    # query_feat=np.array([[0.11,0.22,0.33,0.44]])
+    # d = psdb('test')
+    # d.evaluate_search(gallery_det,gallery_feat,query_feat)
+    #test _load_probes()
+    d=psdb('test')
+    probes=d._load_probes()
+    print(probes)
