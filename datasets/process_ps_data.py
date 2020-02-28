@@ -196,6 +196,7 @@ class ps_data_manager:
         return q_tensor
 
     def get_gallery_det_inputs(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+
         g_det=[]
         g_Image=[]
         test_roidb=gt_test_roidb()
