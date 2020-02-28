@@ -28,6 +28,8 @@ from torchvision.models.resnet import Bottleneck, resnet50
 import torch
 import numpy as np
 from datasets.psdb import psdb
+import os.path as osp
+import os
 
 if __name__ == '__main__':
     # det=np.array([[1,2,3,4,5],[1,2,3,4,5]])
@@ -36,6 +38,4 @@ if __name__ == '__main__':
     # probes=test.probes
     # print(probes)
 
-    a=np.array([[1,2],[3,4]])
-    b=np.hstack((a,np.ones((a.shape[0],1))))
-    print(b)
+    print(os.path.abspath('.'))

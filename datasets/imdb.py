@@ -14,7 +14,7 @@ import PIL
 # from model.utils.cython_bbox import bbox_overlaps
 import numpy as np
 import scipy.sparse
-from utils.config import cfg
+#from utils.config import cfg
 #import pdb
 
 ROOT_DIR = osp.join(osp.dirname(__file__), '..', '..')
@@ -79,7 +79,8 @@ class imdb(object):
 
   @property
   def cache_path(self):
-    cache_path = osp.abspath(osp.join(cfg.DATA_DIR, 'cache'))
+    #cache_path = osp.abspath(osp.join(cfg.DATA_DIR, 'cache'))
+    cache_path= osp.abspath(osp.join(osp.dirname(__file__), '..', '..', 'data', 'cache'))
     if not os.path.exists(cache_path):
       os.makedirs(cache_path)
     return cache_path
@@ -223,34 +224,34 @@ class imdb(object):
   #   return {'ar': ar, 'recalls': recalls, 'thresholds': thresholds,
   #           'gt_overlaps': gt_overlaps}
 
-  def create_roidb_from_box_list(self, box_list, gt_roidb):
-    assert len(box_list) == self.num_images, \
-      'Number of boxes must match number of ground-truth images'
-    roidb = []
-    for i in range(self.num_images):
-      boxes = box_list[i]
-      num_boxes = boxes.shape[0]
-      overlaps = np.zeros((num_boxes, self.num_classes), dtype=np.float32)
-
-      if gt_roidb is not None and gt_roidb[i]['boxes'].size > 0:
-        gt_boxes = gt_roidb[i]['boxes']
-        gt_classes = gt_roidb[i]['gt_classes']
-        gt_overlaps = bbox_overlaps(boxes.astype(np.float),
-                                    gt_boxes.astype(np.float))
-        argmaxes = gt_overlaps.argmax(axis=1)
-        maxes = gt_overlaps.max(axis=1)
-        I = np.where(maxes > 0)[0]
-        overlaps[I, gt_classes[argmaxes[I]]] = maxes[I]
-
-      overlaps = scipy.sparse.csr_matrix(overlaps)
-      roidb.append({
-        'boxes': boxes,
-        'gt_classes': np.zeros((num_boxes,), dtype=np.int32),
-        'gt_overlaps': overlaps,
-        'flipped': False,
-        'seg_areas': np.zeros((num_boxes,), dtype=np.float32),
-      })
-    return roidb
+  # def create_roidb_from_box_list(self, box_list, gt_roidb):
+  #   assert len(box_list) == self.num_images, \
+  #     'Number of boxes must match number of ground-truth images'
+  #   roidb = []
+  #   for i in range(self.num_images):
+  #     boxes = box_list[i]
+  #     num_boxes = boxes.shape[0]
+  #     overlaps = np.zeros((num_boxes, self.num_classes), dtype=np.float32)
+  #
+  #     if gt_roidb is not None and gt_roidb[i]['boxes'].size > 0:
+  #       gt_boxes = gt_roidb[i]['boxes']
+  #       gt_classes = gt_roidb[i]['gt_classes']
+  #       gt_overlaps = bbox_overlaps(boxes.astype(np.float),
+  #                                   gt_boxes.astype(np.float))
+  #       argmaxes = gt_overlaps.argmax(axis=1)
+  #       maxes = gt_overlaps.max(axis=1)
+  #       I = np.where(maxes > 0)[0]
+  #       overlaps[I, gt_classes[argmaxes[I]]] = maxes[I]
+  #
+  #     overlaps = scipy.sparse.csr_matrix(overlaps)
+  #     roidb.append({
+  #       'boxes': boxes,
+  #       'gt_classes': np.zeros((num_boxes,), dtype=np.int32),
+  #       'gt_overlaps': overlaps,
+  #       'flipped': False,
+  #       'seg_areas': np.zeros((num_boxes,), dtype=np.float32),
+  #     })
+  #   return roidb
 
   @staticmethod
   def merge_roidbs(a, b):
@@ -268,3 +269,4 @@ class imdb(object):
   def competition_mode(self, on):
     """Turn competition mode on or off."""
     pass
+
