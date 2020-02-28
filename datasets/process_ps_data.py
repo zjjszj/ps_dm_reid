@@ -190,7 +190,7 @@ class ps_data_manager:
             box=item[1]
             img=read_pedeImage(img_path)
             pede=img.crop(box)
-            q_Image.extend(pede)
+            q_Image.append(pede)
         q_tensor=TrainTransform()(q_Image)
         q_tensor=torch.stack(q_tensor)
         return q_tensor
