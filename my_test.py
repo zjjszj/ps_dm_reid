@@ -38,4 +38,15 @@ if __name__ == '__main__':
     # probes=test.probes
     # print(probes)
 
-    print(os.path.abspath('.'))
+    #a代表源数据，b代表转化后的数据
+    #a变b也变
+    a=np.ones([2,3])
+    aa=np.array([[1,2],[3,4]])
+    b=torch.tensor(aa) #不能
+    #b=torch.from_numpy(a) #能
+
+    c=b.numpy()  #能绑定
+    d=np.asarray(a)
+
+    t=[[1],[2]]
+    print(t[[0,1]])

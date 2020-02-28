@@ -1,15 +1,13 @@
 from os import path as osp
 import _pickle as cPickle
-import os
-import re
 from PIL import Image
 import os.path as osp
-from torch.utils.data import Dataset
 from torchvision import transforms as T
 import random
-from torch.utils.data import DataLoader
 import torch
 from datasets.psdb import psdb
+import math
+import numpy as np
 
 class Cutout(object):
     def __init__(self, probability=0.5, size=64, mean=[0.4914, 0.4822, 0.4465]):
@@ -141,6 +139,12 @@ class ps_data_manager:
         return pid2label
 
     def get_batchData(self, i_batch, batch_size):
+        """
+        get batch_size images per time. convert those images to pedes for model inputs.
+        :param i_batch: index of batch
+        :param batch_size:
+        :return:
+        """
         pedes_batch_x = []
         pedes_batch_y = []
         indexs_batch = [self.indexs[i] for i in range(i_batch * batch_size,
@@ -198,7 +202,7 @@ class ps_data_manager:
     def get_gallery_det_inputs(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
 
         g_det=[]
-        g_Image=[]
+        g_tensor=[]
         test_roidb=gt_test_roidb()
         for img in test_roidb:
             boxes=img['boxes']
@@ -206,19 +210,32 @@ class ps_data_manager:
             #boxes = np.hstack((a, np.ones((a.shape[0], 1))))
             g_det.append(boxes)
             image=read_pedeImage(osp.join(img_dir, im_name))
+            img_Image=[]
             for box in boxes:
                 pede_Image=image.crop(box)
-                g_Image.append(pede_Image)
-
-        g_tensor = TrainTransform()(g_Image)
-        g_tensor=torch.stack(g_tensor)
-        return g_det, g_tensor
+                img_Image.append(pede_Image)
+                img_Image=TrainTransform()(img_Image)
+            g_tensor.append(img_Image)
+        return g_det, g_tensor   #[[[box/tensor],...],...]
 
     def evaluate(self, model):
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         q_inputs=self.get_query_inputs()
-        g_det, g_inputs=self.get_gallery_det_inputs()
-        q_feat=model(q_inputs.cuda())
-        g_feat=model(g_inputs.cuda())
+        g_det, g_tensor=self.get_gallery_det_inputs()
+        #分批次输入到网络，batch_size=64
+        q_feat=[]
+        batch_size=64
+        for i in range(math.ceil(q_inputs.size(0)/batch_size)):
+            start=i*batch_size
+            end=start+batch_size if (start+batch_size)<q_inputs.size()[0] else q_inputs.size()[0]
+            q_feat.extend(model(q_inputs[start:end].cuda()).cpu())
+        q_feat=q_feat.numpy()   #[[feat1], ...]
+
+
+        g_feat=[]
+        for img in g_tensor:
+            img=torch.stack(img)
+            g_feat.append(model(img.cuda()).cpu())
+        g_feat=g_feat.numpy()   #[[feat1], ...]
         test.evaluate_search(g_det,g_feat,q_feat)
 
