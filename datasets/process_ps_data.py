@@ -220,8 +220,6 @@ class ps_data_manager:
             q_Image.append(pede)
         q_tensor=TrainTransform()(q_Image)
         q_tensor=torch.stack(q_tensor)
-        del q_Image
-        gc.collect()
 
         return q_tensor
 
@@ -242,8 +240,8 @@ class ps_data_manager:
                 img_Image.append(pede_Image)
                 img_Image=TrainTransform()(img_Image)
                 g_tensor.append(img_Image)
-                del img_Image
-                gc.collect()
+                # del img_Image
+                # gc.collect()
 
         return g_det, g_tensor   #[[[tensor],...],...]
 
@@ -255,17 +253,17 @@ class ps_data_manager:
         if load:
             # load
             q_inputs=_load('q_inputs.pkl',r'F:/datasets/reid/')
-            #g_det=_load('g_det.pkl',r'F:/datasets/reid/')
-            #g_tensor=_load('g_tensor.pkl',r'F:/datasets/reid/')
+            g_det=_load('g_det.pkl',r'F:/datasets/reid/')
+            g_tensor=_load('g_tensor.pkl',r'F:/datasets/reid/')
             pass
         else:
-            q_inputs=self.get_query_inputs()
+            #q_inputs=self.get_query_inputs()
             g_det, g_tensor=self.get_gallery_det_tensor()
         if save:
             #save
-            pickle(q_inputs, './evaluate_data', 'g_inputs.pkl')
-            #pickle(g_det, './evaluate_data', 'g_det.pkl')
-            #pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
+            #pickle(q_inputs, './evaluate_data', 'g_inputs.pkl')
+            pickle(g_det, './evaluate_data', 'g_det.pkl')
+            pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
             return
 
 
