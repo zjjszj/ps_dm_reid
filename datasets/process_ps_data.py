@@ -228,6 +228,7 @@ class ps_data_manager:
         for i in range(math.ceil(q_inputs.size(0)/batch_size)):
             start=i*batch_size
             end=start+batch_size if (start+batch_size)<q_inputs.size()[0] else q_inputs.size()[0]
+            print('nums train imgs===', end-start)
             q_feat.extend(model(q_inputs[start:end].cuda()).cpu())
         q_feat=q_feat.numpy()   #[[feat1], ...]
 
@@ -237,6 +238,8 @@ class ps_data_manager:
             img=torch.stack(img)
             g_feat.append(model(img.cuda()).cpu())
         g_feat=g_feat.numpy()   #[[feat1], ...]
+
+        print('begin run evaluate_search() function......')
         test.evaluate_search(g_det,g_feat,q_feat)
 
 
