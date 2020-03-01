@@ -50,7 +50,7 @@ def pickle(data, save_dir, file_name):
     mkdir_if_missing(save_dir)
     file_path=osp.join(save_dir, file_name)
     with open(file_path, 'wb') as f:
-        cPickle.dump(data, f, cPickle.HIGHEST_PROTOCOL)
+        cPickle.dump(data, f, 0)
 
 def unpickle(file_path):
     with open(file_path, 'rb') as f:
