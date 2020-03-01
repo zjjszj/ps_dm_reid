@@ -29,7 +29,7 @@ import torch
 import numpy as np
 from datasets.psdb import psdb
 import os.path as osp
-import os
+import sys
 
 if __name__ == '__main__':
     # det=np.array([[1,2,3,4,5],[1,2,3,4,5]])
@@ -39,10 +39,6 @@ if __name__ == '__main__':
     # print(probes)
 
 
-
-    a=torch.tensor([1,2])
-    b=torch.tensor([3,4])
     c=[]
-    c.extend(a)
-    c.extend(b)
-    print(c)
+
+    print(2,"m")
