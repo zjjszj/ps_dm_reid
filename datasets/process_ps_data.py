@@ -10,6 +10,7 @@ import math
 import numpy as np
 import sys
 import errno
+import os
 
 class Cutout(object):
     def __init__(self, probability=0.5, size=64, mean=[0.4914, 0.4822, 0.4465]):
