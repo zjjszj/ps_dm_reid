@@ -11,6 +11,7 @@ import numpy as np
 import sys
 import errno
 import os
+import gc
 
 class Cutout(object):
     def __init__(self, probability=0.5, size=64, mean=[0.4914, 0.4822, 0.4465]):
@@ -219,6 +220,9 @@ class ps_data_manager:
             q_Image.append(pede)
         q_tensor=TrainTransform()(q_Image)
         q_tensor=torch.stack(q_tensor)
+        del q_Image
+        gc.collect()
+
         return q_tensor
 
     def get_gallery_det_tensor(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
@@ -238,6 +242,9 @@ class ps_data_manager:
                 img_Image.append(pede_Image)
                 img_Image=TrainTransform()(img_Image)
                 g_tensor.append(img_Image)
+                del img_Image
+                gc.collect()
+                
         return g_det, g_tensor   #[[[tensor],...],...]
 
     def evaluate(self, model):
