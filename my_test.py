@@ -38,6 +38,7 @@ if __name__ == '__main__':
     # probes=test.probes
     # print(probes)
 
-
-    c=[1,2,3]
-    print(2,"m")
+    a=True
+    if a:
+        b=2
+    print(b)

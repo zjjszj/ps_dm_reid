@@ -9,6 +9,7 @@ from datasets.psdb import psdb
 import math
 import numpy as np
 import sys
+import errno
 
 class Cutout(object):
     def __init__(self, probability=0.5, size=64, mean=[0.4914, 0.4822, 0.4465]):
@@ -37,8 +38,16 @@ class Cutout(object):
                 return img
         return img
 
+def mkdir_if_missing(dir_path):
+    try:
+        os.makedirs(dir_path)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
-def pickle(data, file_path):
+def pickle(data, save_dir, file_name):
+    mkdir_if_missing(save_dir)
+    file_path=osp.join(save_dir, file_name)
     with open(file_path, 'wb') as f:
         cPickle.dump(data, f, cPickle.HIGHEST_PROTOCOL)
 
@@ -232,14 +241,27 @@ class ps_data_manager:
 
     def evaluate(self, model):
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
-        q_inputs=self.get_query_inputs()
-        g_det, g_tensor=self.get_gallery_det_tensor()
 
-        #save
-        pickle(q_inputs, osp.join('./evaluate_data', 'g_inputs.pkl'))
-        pickle(g_det, osp.join('./evaluate_data', 'g_det.pkl'))
-        pickle(g_tensor, osp.join('./evaluate_data', 'g_tensor.pkl'))
-        return
+        load=False
+        save=True
+        if load:
+            # load
+            q_inputs=_load('q_inputs.pkl',r'F:/datasets/reid/')
+            g_det=_load('g_det.pkl',r'F:/datasets/reid/')
+            g_tensor=_load('g_tensor.pkl',r'F:/datasets/reid/')
+            pass
+        else:
+            q_inputs=self.get_query_inputs()
+            g_det, g_tensor=self.get_gallery_det_tensor()
+        if save:
+            #save
+            pickle(q_inputs, './evaluate_data', 'g_inputs.pkl')
+            pickle(g_det, './evaluate_data', 'g_det.pkl')
+            pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
+            return
+
+
+
 
         print('g_tensor size=', sys.getsizeof(g_tensor) / pow(10, 6), 'M')  # M
 
