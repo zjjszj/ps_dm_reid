@@ -244,7 +244,7 @@ class ps_data_manager:
                 g_tensor.append(img_Image)
                 del img_Image
                 gc.collect()
-                
+
         return g_det, g_tensor   #[[[tensor],...],...]
 
     def evaluate(self, model):
@@ -255,8 +255,8 @@ class ps_data_manager:
         if load:
             # load
             q_inputs=_load('q_inputs.pkl',r'F:/datasets/reid/')
-            g_det=_load('g_det.pkl',r'F:/datasets/reid/')
-            g_tensor=_load('g_tensor.pkl',r'F:/datasets/reid/')
+            #g_det=_load('g_det.pkl',r'F:/datasets/reid/')
+            #g_tensor=_load('g_tensor.pkl',r'F:/datasets/reid/')
             pass
         else:
             q_inputs=self.get_query_inputs()
@@ -264,8 +264,8 @@ class ps_data_manager:
         if save:
             #save
             pickle(q_inputs, './evaluate_data', 'g_inputs.pkl')
-            pickle(g_det, './evaluate_data', 'g_det.pkl')
-            pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
+            #pickle(g_det, './evaluate_data', 'g_det.pkl')
+            #pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
             return
 
 
