@@ -199,7 +199,7 @@ class ps_data_manager:
         q_tensor=torch.stack(q_tensor)
         return q_tensor
 
-    def get_gallery_det_inputs(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+    def get_gallery_det_tensor(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
 
         g_det=[]
         g_tensor=[]
@@ -210,18 +210,18 @@ class ps_data_manager:
             #boxes = np.hstack((a, np.ones((a.shape[0], 1))))
             g_det.append(boxes)
             image=read_pedeImage(osp.join(img_dir, im_name))
-            img_Image=[]
             for box in boxes:
+                img_Image = []
                 pede_Image=image.crop(box)
                 img_Image.append(pede_Image)
                 img_Image=TrainTransform()(img_Image)
-            g_tensor.append(img_Image)
-        return g_det, g_tensor   #[[[box/tensor],...],...]
+                g_tensor.append(img_Image)
+        return g_det, g_tensor   #[[[tensor],...],...]
 
     def evaluate(self, model):
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         q_inputs=self.get_query_inputs()
-        g_det, g_tensor=self.get_gallery_det_inputs()
+        g_det, g_tensor=self.get_gallery_det_tensor()
         #分批次输入到网络，batch_size=64
         q_feat=[]
         batch_size=64
