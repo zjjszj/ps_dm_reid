@@ -240,8 +240,8 @@ class ps_data_manager:
                 img_Image.append(pede_Image)
                 img_Image=TrainTransform()(img_Image)
                 g_tensor.append(img_Image)
-                # del img_Image
-                # gc.collect()
+                del img_Image
+                gc.collect()
 
         return g_det, g_tensor   #[[[tensor],...],...]
 
@@ -258,12 +258,17 @@ class ps_data_manager:
             pass
         else:
             #q_inputs=self.get_query_inputs()
+            print('begin...get_gallery_det_tensor...')
             g_det, g_tensor=self.get_gallery_det_tensor()
+            print('end...get_gallery_det_tensor...')
+
         if save:
             #save
             #pickle(q_inputs, './evaluate_data', 'g_inputs.pkl')
+            print('begin...pickle...')
             pickle(g_det, './evaluate_data', 'g_det.pkl')
             pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
+            print('end...pickle...')
             return
 
 
