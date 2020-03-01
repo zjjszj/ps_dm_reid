@@ -37,11 +37,22 @@ class Cutout(object):
                 return img
         return img
 
+
+def pickle(data, file_path):
+    with open(file_path, 'wb') as f:
+        cPickle.dump(data, f, cPickle.HIGHEST_PROTOCOL)
+
 def unpickle(file_path):
     with open(file_path, 'rb') as f:
         data = cPickle.load(f)
     return data
 
+
+def _load(fname, output_dir):
+    fpath = osp.join(output_dir, fname)
+    assert osp.isfile(fpath), "Must have extracted detections and " \
+                              "features first before evaluation"
+    return unpickle(fpath)
 
 def gt_train_roidb():
     #cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录  用于pycharm
@@ -223,6 +234,13 @@ class ps_data_manager:
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         q_inputs=self.get_query_inputs()
         g_det, g_tensor=self.get_gallery_det_tensor()
+
+        #save
+        pickle(q_inputs, osp.join('./evaluate_data', 'g_inputs.pkl'))
+        pickle(g_det, osp.join('./evaluate_data', 'g_det.pkl'))
+        pickle(g_tensor, osp.join('./evaluate_data', 'g_tensor.pkl'))
+        return
+
         print('g_tensor size=', sys.getsizeof(g_tensor) / pow(10, 6), 'M')  # M
 
         #分批次输入到网络，batch_size=64

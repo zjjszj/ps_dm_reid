@@ -39,6 +39,5 @@ if __name__ == '__main__':
     # print(probes)
 
 
-    c=[]
-
+    c=[1,2,3]
     print(2,"m")
