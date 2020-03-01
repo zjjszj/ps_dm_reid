@@ -8,6 +8,7 @@ import torch
 from datasets.psdb import psdb
 import math
 import numpy as np
+import gc
 
 class Cutout(object):
     def __init__(self, probability=0.5, size=64, mean=[0.4914, 0.4822, 0.4465]):
@@ -197,6 +198,8 @@ class ps_data_manager:
             q_Image.append(pede)
         q_tensor=TrainTransform()(q_Image)
         q_tensor=torch.stack(q_tensor)
+        del q_Image
+        gc.collect()
         return q_tensor
 
     def get_gallery_det_tensor(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
@@ -216,6 +219,8 @@ class ps_data_manager:
                 img_Image.append(pede_Image)
                 img_Image=TrainTransform()(img_Image)
                 g_tensor.append(img_Image)
+        del img_Image
+        gc.collect()
         return g_det, g_tensor   #[[[tensor],...],...]
 
     def evaluate(self, model):
@@ -224,11 +229,11 @@ class ps_data_manager:
         g_det, g_tensor=self.get_gallery_det_tensor()
         #分批次输入到网络，batch_size=64
         q_feat=[]
-        batch_size=64
+        batch_size=32
         for i in range(math.ceil(q_inputs.size(0)/batch_size)):
+            print('di i batch ',i)
             start=i*batch_size
             end=start+batch_size if (start+batch_size)<q_inputs.size()[0] else q_inputs.size()[0]
-            print('nums train imgs===', end-start)
             q_feat.extend(model(q_inputs[start:end].cuda()).cpu())
         q_feat=q_feat.numpy()   #[[feat1], ...]
 
