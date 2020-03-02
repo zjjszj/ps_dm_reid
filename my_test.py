@@ -39,9 +39,3 @@ if __name__ == '__main__':
     # probes=test.probes
     # print(probes)
 
-    a=2
-    b=[]
-    b.append(a)
-    del a
-    gc.collect()
-    print(b)

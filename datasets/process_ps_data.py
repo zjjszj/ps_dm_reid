@@ -259,14 +259,11 @@ class ps_data_manager:
     def evaluate(self, model):
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
 
-        load=False
-        save=True
+        load=True
+        save=False
         if load:
             # load
-            q_inputs=_load('q_inputs.pkl',r'F:/datasets/reid/')
-            g_det=_load('g_det.pkl',r'F:/datasets/reid/')
-            g_tensor=_load('g_tensor.pkl',r'F:/datasets/reid/')
-            pass
+            q_inputs=_load('q_inputs.pkl','/kaggle/input/q_inputs')
         else:
             #q_inputs=self.get_query_inputs()
             #print('begin...get_gallery_det...')
@@ -285,11 +282,8 @@ class ps_data_manager:
             print('end...pickle...')
             return
 
-
-
-
-
-        #分批次输入到网络，batch_size=64
+        #query
+        #分批次输入到网络，batch_size=32
         q_feat=[]
         batch_size=32
         for i in range(math.ceil(q_inputs.size(0)/batch_size)):
@@ -299,13 +293,28 @@ class ps_data_manager:
             q_feat.extend(model(q_inputs[start:end].cuda()))
         q_feat=q_feat.numpy()   #[[feat1], ...]
 
-
+        #gallery
+        test_roidb=gt_test_roidb()
         g_feat=[]
-        for img in g_tensor:
-            img=torch.stack(img)
-            g_feat.append(model(img.cuda()).cpu())
-        g_feat=g_feat.numpy()   #[[feat1], ...]
+        for img in test_roidb:
+            boxes=img['boxes']
+            img_name=img['im_name']
+            img_Image=read_pedeImage(osp.join('/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM',img_name))
+            pedes=[]
+            for box in boxes:
+                pede=img_Image.crop(box)
+                pede = T.Resize((128, 64))(pede)
+                pede = T.RandomHorizontalFlip()(pede)
+                pede = T.ToTensor()(pede)
+                pede = T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(pede)
+                # Cutout预处理
+                pede = Cutout(probability=0.5, size=64, mean=[0.0, 0.0, 0.0])(pede)  # [3, 128, 64]
 
+                pedes.append(model(pede.cuda()))
+            g_feat.append(pedes)
+        g_feat=np.asarray(g_feat)
+            #det
+        g_det=self.get_gallery_det()
         print('begin run evaluate_search() function......')
         test.evaluate_search(g_det,g_feat,q_feat)
 
