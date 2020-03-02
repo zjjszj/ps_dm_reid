@@ -232,6 +232,11 @@ class ps_data_manager:
         return g_det
 
     def get_gallery_tensor(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+        """
+        调用该方法cpu内存不够
+        :param img_dir:
+        :return:
+        """
         g_tensor=[]
         test_roidb=gt_test_roidb()
         for img in test_roidb:
@@ -243,9 +248,9 @@ class ps_data_manager:
                 img_Image = []
                 pede_Image=image.crop(box)
                 img_Image.append(pede_Image)
-                img_Image=TrainTransform()(img_Image)
-                g_tensor.append(img_Image)
-                del img_Image
+                img_tensor=TrainTransform()(img_Image)
+                g_tensor.append(img_tensor)
+                del img_Image, img_tensor
                 gc.collect()
         return g_tensor   #[[[tensor],...],...]
 
@@ -263,26 +268,25 @@ class ps_data_manager:
             pass
         else:
             #q_inputs=self.get_query_inputs()
-            print('begin...get_gallery_det...')
-            g_det=self.get_gallery_det()
+            #print('begin...get_gallery_det...')
+            #g_det=self.get_gallery_det()
             # print('end...get_gallery_det...')
-            # print('begin...get_gallery_tensor...')
-            # g_tensor=self.get_gallery_tensor()
-            # print('end...get_gallery_tensor...')
+            print('begin...get_gallery_tensor...')
+            g_tensor=self.get_gallery_tensor()
+            print('end...get_gallery_tensor...')
 
         if save:
             #save
             #pickle(q_inputs, './evaluate_data', 'g_inputs.pkl')
             print('begin...pickle...')
-            pickle(g_det, './evaluate_data', 'g_det.pkl')
-            #pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
+            #pickle(g_det, './evaluate_data', 'g_det.pkl')
+            pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
             print('end...pickle...')
             return
 
 
 
 
-        print('g_tensor size=', sys.getsizeof(g_tensor) / pow(10, 6), 'M')  # M
 
         #分批次输入到网络，batch_size=64
         q_feat=[]
@@ -292,7 +296,6 @@ class ps_data_manager:
             start=i*batch_size
             end=start+batch_size if (start+batch_size)<q_inputs.size()[0] else q_inputs.size()[0]
             q_feat.extend(model(q_inputs[start:end].cuda()))
-            print('q_feat size=',sys.getsizeof(q_feat) / pow(10, 6),'M')  #M
         q_feat=q_feat.numpy()   #[[feat1], ...]
 
 

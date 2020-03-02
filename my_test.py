@@ -30,6 +30,7 @@ import numpy as np
 from datasets.psdb import psdb
 import os.path as osp
 import sys
+import gc
 
 if __name__ == '__main__':
     # det=np.array([[1,2,3,4,5],[1,2,3,4,5]])
@@ -38,7 +39,9 @@ if __name__ == '__main__':
     # probes=test.probes
     # print(probes)
 
-    a=True
-    if a:
-        b=2
+    a=2
+    b=[]
+    b.append(a)
+    del a
+    gc.collect()
     print(b)
