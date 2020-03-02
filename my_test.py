@@ -27,11 +27,7 @@ class Test:
 from torchvision.models.resnet import Bottleneck, resnet50
 import torch
 import numpy as np
-from datasets.psdb import psdb
-import os.path as osp
-import sys
-import gc
-
+import torch.nn as nn
 if __name__ == '__main__':
     # det=np.array([[1,2,3,4,5],[1,2,3,4,5]])
     # gallery_feat=np.array([[0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5]])
@@ -39,6 +35,4 @@ if __name__ == '__main__':
     # probes=test.probes
     # print(probes)
 
-    a=torch.tensor([2,3])
-    b=a.squeeze()
-    print(b)
+    nn.BatchNorm2

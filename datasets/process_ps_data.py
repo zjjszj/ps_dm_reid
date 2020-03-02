@@ -216,7 +216,6 @@ class ps_data_manager:
         for i in range(math.ceil(len(probes)/batch_size)):
             start=i*batch_size
             end=start+batch_size if (start+batch_size)<len(probes) else len(probes)
-            if((end-start)==0): continue
             batch_probes=probes[start:end]
             pedes_Image=[]
             for probe in batch_probes:
@@ -246,7 +245,6 @@ class ps_data_manager:
         for i in range(math.ceil(len(test_roidb)/batch_size)):
             start=i*batch_size
             end=start+batch_size if(start+batch_size)<len(test_roidb) else len(test_roidb)
-            if ((end-start)==0): continue
             batch_roidbs=test_roidb[start:end]
             img_Image = []
             for img in batch_roidbs:
@@ -257,16 +255,15 @@ class ps_data_manager:
                     pede_Image=image.crop(box)
                     img_Image.append(pede_Image)
             img_list = TrainTransform()(img_Image)
-            print('len(img_list===)',len(img_list))
             g_feat.append(model(torch.stack(img_list).cuda()))
             del img_list, img_Image
             gc.collect()
-            
+
         return np.asarray(g_feat)   #[[[tensor],...],...]
 
     def evaluate(self, model):
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
-
+        model.eval()
         print('begin...get_gallery_det...')
         g_det=self.get_gallery_det()
         print('end...get_gallery_det...')
