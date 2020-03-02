@@ -241,15 +241,21 @@ class ps_data_manager:
 
         test_roidb=gt_test_roidb()
         g_feat=[]
-        for img in test_roidb:
-            boxes=img['boxes']
-            im_name=img['im_name']
-            #boxes = np.hstack((a, np.ones((a.shape[0], 1))))
-            image=read_pedeImage(osp.join(img_dir, im_name))
-            img_Image=[]
-            for box in boxes:
-                pede_Image=image.crop(box)
-                img_Image.append(pede_Image)
+        batch_size=2
+        for i in range(math.ceil(len(test_roidb)/batch_size)):
+            start=i*batch_size
+            end=start+batch_size if(start+batch_size)<len(test_roidb) else len(test_roidb)
+            if ((end-start)==0): continue
+            batch_roidbs=test_roidb[start:end]
+            img_Image = []
+            for img in batch_roidbs:
+                boxes=img['boxes']
+                im_name=img['im_name']
+                #boxes = np.hstack((a, np.ones((a.shape[0], 1))))
+                image=read_pedeImage(osp.join(img_dir, im_name))
+                for box in boxes:
+                    pede_Image=image.crop(box)
+                    img_Image.append(pede_Image)
             img_list = TrainTransform()(img_Image)
             g_feat.append(model(torch.stack(img_list).cuda()))
         return np.asarray(g_feat)   #[[[tensor],...],...]
