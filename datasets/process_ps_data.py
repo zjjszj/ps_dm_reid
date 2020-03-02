@@ -245,15 +245,13 @@ class ps_data_manager:
             im_name=img['im_name']
             #boxes = np.hstack((a, np.ones((a.shape[0], 1))))
             image=read_pedeImage(osp.join(img_dir, im_name))
-            img_tensor=[]
+            img_Image=[]
             for box in boxes:
                 pede_Image=image.crop(box)
-                pede_tensor=TrainTransform()(pede_Image)
-                img_tensor.append(pede_tensor)
-                del pede_tensor
-                gc.collect()
+                img_Image.append(pede_Image)
+            img_tensor = TrainTransform()(img_Image)
             g_tensor.append(img_tensor)
-            del img_tensor
+            del img_tensor, img_Image
             gc.collect()
         return g_tensor   #[[[tensor],...],...]
 
