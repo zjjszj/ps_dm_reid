@@ -223,16 +223,21 @@ class ps_data_manager:
 
         return q_tensor
 
-    def get_gallery_det_tensor(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
-
+    def get_gallery_det(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
         g_det=[]
+        test_roidb=gt_test_roidb()
+        for img in test_roidb:
+            boxes=img['boxes']
+            g_det.append(boxes)
+        return g_det
+
+    def get_gallery_tensor(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
         g_tensor=[]
         test_roidb=gt_test_roidb()
         for img in test_roidb:
             boxes=img['boxes']
             im_name=img['im_name']
             #boxes = np.hstack((a, np.ones((a.shape[0], 1))))
-            g_det.append(boxes)
             image=read_pedeImage(osp.join(img_dir, im_name))
             for box in boxes:
                 img_Image = []
@@ -242,8 +247,8 @@ class ps_data_manager:
                 g_tensor.append(img_Image)
                 del img_Image
                 gc.collect()
+        return g_tensor   #[[[tensor],...],...]
 
-        return g_det, g_tensor   #[[[tensor],...],...]
 
     def evaluate(self, model):
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
@@ -258,16 +263,19 @@ class ps_data_manager:
             pass
         else:
             #q_inputs=self.get_query_inputs()
-            print('begin...get_gallery_det_tensor...')
-            g_det, g_tensor=self.get_gallery_det_tensor()
-            print('end...get_gallery_det_tensor...')
+            print('begin...get_gallery_det...')
+            g_det=self.get_gallery_det()
+            # print('end...get_gallery_det...')
+            # print('begin...get_gallery_tensor...')
+            # g_tensor=self.get_gallery_tensor()
+            # print('end...get_gallery_tensor...')
 
         if save:
             #save
             #pickle(q_inputs, './evaluate_data', 'g_inputs.pkl')
             print('begin...pickle...')
             pickle(g_det, './evaluate_data', 'g_det.pkl')
-            pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
+            #pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
             print('end...pickle...')
             return
 
