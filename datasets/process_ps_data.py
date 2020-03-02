@@ -225,8 +225,8 @@ class ps_data_manager:
                 img=read_pedeImage(img_path)
                 pede=img.crop(box)
                 pedes_Image.append(pede)
-            pedes_tensor=TrainTransform()(pedes_Image)
-            q_feat.extend(model(pedes_tensor.cuda()))
+            pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
+            q_feat.extend(model(torch.stack(pedes_list).cuda()))
             return q_feat
 
     def get_gallery_det(self):
@@ -250,8 +250,8 @@ class ps_data_manager:
             for box in boxes:
                 pede_Image=image.crop(box)
                 img_Image.append(pede_Image)
-            img_tensor = TrainTransform()(img_Image)
-            g_feat.append(model(img_tensor.cuda()))
+            img_list = TrainTransform()(img_Image)
+            g_feat.append(model(torch.stack(img_list).cuda()))
         return np.asarray(g_feat)   #[[[tensor],...],...]
 
     def evaluate(self, model):
