@@ -285,7 +285,7 @@ class ps_data_manager:
         #query
         #分批次输入到网络，batch_size=32
         q_feat=[]
-        batch_size=32
+        batch_size=16
         for i in range(math.ceil(q_inputs.size(0)/batch_size)):
             print('di i batch ',i)
             start=i*batch_size
