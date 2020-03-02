@@ -212,20 +212,22 @@ class ps_data_manager:
         q_feat=[]
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         probes = test.probes  #[(img_path,box)...]
-        for item in probes:
-            img_path=item[0]
-            box=item[1]
-            img=read_pedeImage(img_path)
-            pede=img.crop(box)
-            pede = T.Resize((128, 64))(pede)
-            pede = T.RandomHorizontalFlip()(pede)
-            pede = T.ToTensor()(pede)
-            pede = T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(pede)
-            # Cutout预处理
-            pede = Cutout(probability=0.5, size=64, mean=[0.0, 0.0, 0.0])(pede)  # [3, 128, 64]
-            pede=torch.stack((pede,))  #转为4维
-            q_feat.append(model(pede.cuda()))
-        return np.asarray(q_feat)
+        batch_size=4
+        for i in range(math.ceil(len(probes)/batch_size)):
+            start=i*batch_size
+            end=start+batch_size if (start+batch_size)<len(probes) else len(probes)
+            if((end-start)==0): continue
+            batch_probes=probes[start:end]
+            pedes_Image=[]
+            for probe in batch_probes:
+                img_path=probe[0]
+                box=probe[1]
+                img=read_pedeImage(img_path)
+                pede=img.crop(box)
+                pedes_Image.append(pede)
+            pedes_tensor=TrainTransform()(pedes_Image)
+            q_feat.extend(model(pedes_tensor.cuda()))
+            return q_feat
 
     def get_gallery_det(self):
         g_det=[]
