@@ -237,21 +237,24 @@ class ps_data_manager:
         :param img_dir:
         :return:
         """
-        g_tensor=[]
+
         test_roidb=gt_test_roidb()
+        g_tensor=[]
         for img in test_roidb:
             boxes=img['boxes']
             im_name=img['im_name']
             #boxes = np.hstack((a, np.ones((a.shape[0], 1))))
             image=read_pedeImage(osp.join(img_dir, im_name))
+            img_tensor=[]
             for box in boxes:
-                img_Image = []
                 pede_Image=image.crop(box)
-                img_Image.append(pede_Image)
-                img_tensor=TrainTransform()(img_Image)
-                g_tensor.append(img_tensor)
-                del img_Image, img_tensor
+                pede_tensor=TrainTransform()(pede_Image)
+                img_tensor.append(pede_tensor)
+                del pede_tensor
                 gc.collect()
+            g_tensor.append(img_tensor)
+            del img_tensor
+            gc.collect()
         return g_tensor   #[[[tensor],...],...]
 
 
