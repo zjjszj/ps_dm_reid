@@ -208,8 +208,8 @@ class ps_data_manager:
                 pedes_y.append(gt_pids[i])  #self.pids2label[gt_pids[i]]
         return pedes_x, pedes_y
 
-    def get_query_inputs(self):
-        q_Image=[]
+    def get_query_feat(self, model):
+        q_feat=[]
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         probes = test.probes  #[(img_path,box)...]
         for item in probes:
@@ -217,13 +217,16 @@ class ps_data_manager:
             box=item[1]
             img=read_pedeImage(img_path)
             pede=img.crop(box)
-            q_Image.append(pede)
-        q_tensor=TrainTransform()(q_Image)
-        q_tensor=torch.stack(q_tensor)
+            pede = T.Resize((128, 64))(pede)
+            pede = T.RandomHorizontalFlip()(pede)
+            pede = T.ToTensor()(pede)
+            pede = T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(pede)
+            # Cutout预处理
+            pede = Cutout(probability=0.5, size=64, mean=[0.0, 0.0, 0.0])(pede)  # [3, 128, 6
+            q_feat.append(model(pede.cuda()))
+        return np.asarray(q_feat)
 
-        return q_tensor
-
-    def get_gallery_det(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+    def get_gallery_det(self):
         g_det=[]
         test_roidb=gt_test_roidb()
         for img in test_roidb:
@@ -231,15 +234,10 @@ class ps_data_manager:
             g_det.append(boxes)
         return g_det
 
-    def get_gallery_tensor(self, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
-        """
-        调用该方法cpu内存不够
-        :param img_dir:
-        :return:
-        """
+    def get_gallery_feat(self, model, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
 
         test_roidb=gt_test_roidb()
-        g_tensor=[]
+        g_feat=[]
         for img in test_roidb:
             boxes=img['boxes']
             im_name=img['im_name']
@@ -250,71 +248,21 @@ class ps_data_manager:
                 pede_Image=image.crop(box)
                 img_Image.append(pede_Image)
             img_tensor = TrainTransform()(img_Image)
-            g_tensor.append(img_tensor)
-            del img_tensor, img_Image
-            gc.collect()
-        return g_tensor   #[[[tensor],...],...]
-
+            g_feat.append(model(img_tensor.cuda()))
+        return np.asarray(g_feat)   #[[[tensor],...],...]
 
     def evaluate(self, model):
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
 
-        load=True
-        save=False
-        if load:
-            # load
-            q_inputs=_load('g_inputs.pkl','/kaggle/input/q-inputs') #q_inputs误写为g_inputs
-        else:
-            #q_inputs=self.get_query_inputs()
-            #print('begin...get_gallery_det...')
-            #g_det=self.get_gallery_det()
-            # print('end...get_gallery_det...')
-            print('begin...get_gallery_tensor...')
-            g_tensor=self.get_gallery_tensor()
-            print('end...get_gallery_tensor...')
-
-        if save:
-            #save
-            #pickle(q_inputs, './evaluate_data', 'g_inputs.pkl')
-            print('begin...pickle...')
-            #pickle(g_det, './evaluate_data', 'g_det.pkl')
-            pickle(g_tensor, './evaluate_data', 'g_tensor.pkl')
-            print('end...pickle...')
-            return
-
-        #query
-        #分批次输入到网络，batch_size=32
-        q_feat=[]
-        batch_size=16
-        for i in range(math.ceil(q_inputs.size(0)/batch_size)):
-            print('di i batch ',i)
-            start=i*batch_size
-            end=start+batch_size if (start+batch_size)<q_inputs.size()[0] else q_inputs.size()[0]
-            q_feat.extend(model(q_inputs[start:end].cuda()))
-        q_feat=q_feat.numpy()   #[[feat1], ...]
-
-        #gallery
-        test_roidb=gt_test_roidb()
-        g_feat=[]
-        for img in test_roidb:
-            boxes=img['boxes']
-            img_name=img['im_name']
-            img_Image=read_pedeImage(osp.join('/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM',img_name))
-            pedes=[]
-            for box in boxes:
-                pede=img_Image.crop(box)
-                pede = T.Resize((128, 64))(pede)
-                pede = T.RandomHorizontalFlip()(pede)
-                pede = T.ToTensor()(pede)
-                pede = T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(pede)
-                # Cutout预处理
-                pede = Cutout(probability=0.5, size=64, mean=[0.0, 0.0, 0.0])(pede)  # [3, 128, 64]
-
-                pedes.append(model(pede.cuda()))
-            g_feat.append(pedes)
-        g_feat=np.asarray(g_feat)
-            #det
+        print('begin...get_gallery_det...')
         g_det=self.get_gallery_det()
+        print('end...get_gallery_det...')
+        print('begin...get_query_feat...')
+        q_feat=self.get_query_feat(model)
+        print('end...get_query_feat...')
+        print('begin...get_gallery_feat...')
+        g_feat=self.get_gallery_feat(model)
+        print('end...get_gallery_feat...')
         print('begin run evaluate_search() function......')
         test.evaluate_search(g_det,g_feat,q_feat)
 
