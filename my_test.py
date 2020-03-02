@@ -39,4 +39,6 @@ if __name__ == '__main__':
     # probes=test.probes
     # print(probes)
 
-    pass
+    a=torch.tensor([[2],[3]])
+    a=torch.stack((a,))
+    print(a)
