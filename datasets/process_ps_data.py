@@ -223,7 +223,7 @@ class ps_data_manager:
             pede = T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(pede)
             # Cutout预处理
             pede = Cutout(probability=0.5, size=64, mean=[0.0, 0.0, 0.0])(pede)  # [3, 128, 64]
-            pede=torch.stack(pede,)  #转为4维
+            pede=torch.stack((pede,))  #转为4维
             q_feat.append(model(pede.cuda()))
         return np.asarray(q_feat)
 
