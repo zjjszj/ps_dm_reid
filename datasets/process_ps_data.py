@@ -241,24 +241,18 @@ class ps_data_manager:
 
         test_roidb=gt_test_roidb()
         g_feat=[]
-        batch_size=2
-        for i in range(math.ceil(len(test_roidb)/batch_size)):
-            start=i*batch_size
-            end=start+batch_size if(start+batch_size)<len(test_roidb) else len(test_roidb)
-            batch_roidbs=test_roidb[start:end]
+        for img in test_roidb:
             img_Image = []
-            for img in batch_roidbs:
-                boxes=img['boxes']
-                im_name=img['im_name']
-                image=read_pedeImage(osp.join(img_dir, im_name))
-                for box in boxes:
-                    pede_Image=image.crop(box)
-                    img_Image.append(pede_Image)
+            boxes=img['boxes']
+            im_name=img['im_name']
+            image=read_pedeImage(osp.join(img_dir, im_name))
+            for box in boxes:
+                pede_Image=image.crop(box)
+                img_Image.append(pede_Image)
             img_list = TrainTransform()(img_Image)
             g_feat.append(model(torch.stack(img_list).cuda()))
-            del img_list, img_Image
+            del img_Image, img_list
             gc.collect()
-
         return np.asarray(g_feat)   #[[[tensor],...],...]
 
     def evaluate(self, model):
