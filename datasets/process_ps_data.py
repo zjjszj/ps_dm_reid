@@ -263,7 +263,7 @@ class ps_data_manager:
         save=False
         if load:
             # load
-            q_inputs=_load('q_inputs.pkl','/kaggle/input/q_inputs')
+            q_inputs=_load('q_inputs.pkl','/kaggle/input/q-inputs')
         else:
             #q_inputs=self.get_query_inputs()
             #print('begin...get_gallery_det...')
