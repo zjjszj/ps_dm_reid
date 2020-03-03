@@ -34,5 +34,6 @@ if __name__ == '__main__':
     # test=psdb('test')
     # probes=test.probes
     # print(probes)
-
-    nn.BatchNorm2
+    a=torch.tensor([2,3,4,5])
+    a=a.reshape()
+    print(a)
