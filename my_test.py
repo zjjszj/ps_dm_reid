@@ -31,10 +31,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 if __name__ == '__main__':
-    a=[]
-    a.extend(np.array([[2],[3]]))
-    a.extend(np.array([[2],[3]]))
-    print(a)
+   print(int(2.3))
 
 
 

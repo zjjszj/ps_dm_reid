@@ -226,11 +226,11 @@ class ps_data_manager:
                     pede=img.crop(box)
                     pedes_Image.append(pede)
                 pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
-                q_feat.extend(np.asarray(model(torch.stack(pedes_list).cuda()).cpu()))  #q_feat: list [[tensor1],...]
+                q_feat.extend(np.asarray(model(torch.stack(pedes_list).cuda()).cpu()))
                 #del pedes_Image, pedes_list, batch_probes
                 #gc.collect()
         print('len(q_feat)===',len(q_feat))
-        return q_feat
+        return q_feat  #q_feat: list [[array],...]
 
     def get_gallery_det(self):
         g_det=[]
@@ -254,7 +254,7 @@ class ps_data_manager:
                     pede_Image=image.crop(box)
                     img_Image.append(pede_Image)
                 img_list = TrainTransform()(img_Image)
-                g_feat.append(np.asarray(model(torch.stack(img_list).cuda()).cpu())) #g_feat: list [[[tensor1],..],...]
+                g_feat.append(np.asarray(model(torch.stack(img_list).cuda()).cpu()))
                 #del img_Image, img_list
                 #gc.collect()
         return g_feat   #[[[array],...],...]
@@ -264,14 +264,14 @@ class ps_data_manager:
         model.eval()
         print('begin...get_gallery_det...')
         g_det=self.get_gallery_det()
-        print('end...get_gallery_det...')
+        print()
         print('begin...get_query_feat...')
         q_feat=self.get_query_feat(model)
-        print('end...get_query_feat...')
+        print()
         print('begin...get_gallery_feat...')
         g_feat=self.get_gallery_feat(model)
-        print('end...get_gallery_feat...')
+        print()
         print('begin run evaluate_search() function......')
-        test.evaluate_search(g_det,g_feat,q_feat)
+        return test.evaluate_search(g_det,g_feat,q_feat)
 
 
