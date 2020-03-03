@@ -213,21 +213,22 @@ class ps_data_manager:
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         probes = test.probes  #[(img_path,box)...]
         batch_size=16
-        for i in range(math.ceil(len(probes)/batch_size)):
-            start=i*batch_size
-            end=start+batch_size if (start+batch_size)<len(probes) else len(probes)
-            batch_probes=probes[start:end]
-            pedes_Image=[]
-            for probe in batch_probes:
-                img_path=probe[0]
-                box=probe[1]
-                img=read_pedeImage(img_path)
-                pede=img.crop(box)
-                pedes_Image.append(pede)
-            pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
-            q_feat.extend(model(torch.stack(pedes_list).cuda()))
-            del pedes_Image, pedes_list, batch_probes
-            gc.collect()
+        with torch.no_grad():
+            for i in range(math.ceil(len(probes)/batch_size)):
+                start=i*batch_size
+                end=start+batch_size if (start+batch_size)<len(probes) else len(probes)
+                batch_probes=probes[start:end]
+                pedes_Image=[]
+                for probe in batch_probes:
+                    img_path=probe[0]
+                    box=probe[1]
+                    img=read_pedeImage(img_path)
+                    pede=img.crop(box)
+                    pedes_Image.append(pede)
+                pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
+                q_feat.extend(model(torch.stack(pedes_list).cuda()))
+                del pedes_Image, pedes_list, batch_probes
+                gc.collect()
         print('len(q_feat)===',len(q_feat))
         return np.asarray(q_feat)
 
@@ -243,19 +244,20 @@ class ps_data_manager:
 
         test_roidb=gt_test_roidb()
         g_feat=[]
-        for img in test_roidb:
-            img_Image = []
-            boxes=img['boxes']
-            im_name=img['im_name']
-            image=read_pedeImage(osp.join(img_dir, im_name))
-            for box in boxes:
-                pede_Image=image.crop(box)
-                img_Image.append(pede_Image)
-            img_list = TrainTransform()(img_Image)
-            print('len(img_list)==',len(img_list))
-            g_feat.append(model(torch.stack(img_list).cuda()))
-            del img_Image, img_list
-            gc.collect()
+        with torch.no_grad():
+            for img in test_roidb:
+                img_Image = []
+                boxes=img['boxes']
+                im_name=img['im_name']
+                image=read_pedeImage(osp.join(img_dir, im_name))
+                for box in boxes:
+                    pede_Image=image.crop(box)
+                    img_Image.append(pede_Image)
+                img_list = TrainTransform()(img_Image)
+                print('len(img_list)==',len(img_list))
+                g_feat.append(model(torch.stack(img_list).cuda()))
+                del img_Image, img_list
+                gc.collect()
         return np.asarray(g_feat)   #[[[tensor],...],...]
 
     def evaluate(self, model):

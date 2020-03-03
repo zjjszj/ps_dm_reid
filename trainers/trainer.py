@@ -17,7 +17,7 @@ class cls_tripletTrainer:
         self.criterion = criterion
         self.summary_writer = summary_writer
 
-    def train(self, epoch, data_loader,ps_manager):
+    def train(self, epoch, ps_manager, data_loader=None):
         self.model.train()
 
         batch_time = AverageMeter()

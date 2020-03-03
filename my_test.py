@@ -24,19 +24,11 @@ class Test:
     def set_attr(self):
         self.a=2
 
-from torchvision.models.resnet import Bottleneck, resnet50
+def f(a, b):
+    return 1
+
 import torch
 import numpy as np
 import torch.nn as nn
 if __name__ == '__main__':
-    # det=np.array([[1,2,3,4,5],[1,2,3,4,5]])
-    # gallery_feat=np.array([[0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5]])
-    # test=psdb('test')
-    # probes=test.probes
-    # print(probes)
-    a=torch.rand((1,12))
-    a=a.transpose(0,1)
-    b=a.view((2,-1))
-    print(b)
-    c=a.reshape((2,-1))
-    print(c)
+    f(b=2)
