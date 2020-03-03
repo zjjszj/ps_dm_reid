@@ -212,6 +212,7 @@ class BFE(nn.Module):
 
         x = self.batch_crop(x)  #[32, 2048, 24, 8]
         triplet_feature = self.part_maxpool(x).squeeze()  #[N, 2048]
+        print('triplet_feature.size()==', triplet_feature.size())
         feature = self.reduction(triplet_feature)  #[N, 1024]
         softmax_feature = self.softmax(feature)
         triplet_features.append(feature)

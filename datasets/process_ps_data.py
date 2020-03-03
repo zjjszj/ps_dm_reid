@@ -226,9 +226,9 @@ class ps_data_manager:
                 pedes_Image.append(pede)
             pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
             q_feat.extend(model(torch.stack(pedes_list).cuda()))
-            del pedes_Image, pedes_list,
+            del pedes_Image, pedes_list
             gc.collect()
-            
+
         print('len(q_feat)===',len(q_feat))
         return np.asarray(q_feat)
 
