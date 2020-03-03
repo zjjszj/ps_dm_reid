@@ -35,7 +35,8 @@ if __name__ == '__main__':
     # probes=test.probes
     # print(probes)
     a=torch.rand((1,12))
-    c=[]
-    c.append(a)
-    d=torch.cat(c, 1)
-    print(d.size())
+    a=a.transpose(0,1)
+    b=a.view((2,-1))
+    print(b)
+    c=a.reshape((2,-1))
+    print(c)
