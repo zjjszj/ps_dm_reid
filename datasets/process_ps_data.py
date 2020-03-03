@@ -255,8 +255,8 @@ class ps_data_manager:
                     img_Image.append(pede_Image)
                 img_list = TrainTransform()(img_Image)
                 g_feat.append(np.asarray(model(torch.stack(img_list).cuda()).cpu()))
-                #del img_Image, img_list
-                #gc.collect()
+                del img_Image, img_list
+                gc.collect()
         return g_feat   #[[[array],...],...]
 
     def evaluate(self, model):
