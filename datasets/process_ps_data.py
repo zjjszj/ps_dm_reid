@@ -212,7 +212,7 @@ class ps_data_manager:
         q_feat=[]
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
         probes = test.probes  #[(img_path,box)...]
-        batch_size=1
+        batch_size=16
         for i in range(math.ceil(len(probes)/batch_size)):
             start=i*batch_size
             end=start+batch_size if (start+batch_size)<len(probes) else len(probes)
@@ -226,9 +226,8 @@ class ps_data_manager:
                 pedes_Image.append(pede)
             pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
             q_feat.extend(model(torch.stack(pedes_list).cuda()))
-            del pedes_Image, pedes_list
+            del pedes_Image, pedes_list, batch_probes
             gc.collect()
-
         print('len(q_feat)===',len(q_feat))
         return np.asarray(q_feat)
 

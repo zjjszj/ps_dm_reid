@@ -201,7 +201,7 @@ class BFE(nn.Module):
 
         #global branch
         glob = self.global_avgpool(x)  #[2048,1,1]
-        global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)   #[N, 512]  #squeeze==>view
+        global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)   #[N, 512]  #squeeze()==>view
         global_softmax_class = self.global_softmax(global_triplet_feature)
         softmax_features.append(global_softmax_class)
         triplet_features.append(global_triplet_feature)
@@ -211,10 +211,8 @@ class BFE(nn.Module):
         x = self.res_part2(x)
 
         x = self.batch_crop(x)  #[32, 2048, 24, 8]
-        triplet_feature = self.part_maxpool(x).view(len(x), -1)  #[N, 2048] squeeze==>view
-        print('triplet_feature.size()==', triplet_feature.size())
+        triplet_feature = self.part_maxpool(x).view(len(x), -1)  #[N, 2048] squeeze()==>view
         feature = self.reduction(triplet_feature)  #[N, 1024]
-        print('feature.size()==', feature.size())
         softmax_feature = self.softmax(feature)
         triplet_features.append(feature)
         softmax_features.append(softmax_feature)
