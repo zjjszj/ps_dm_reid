@@ -289,7 +289,8 @@ class psdb(imdb):
             imgs, rois = [], []
             count_gt, count_tp = 0, 0
             # Get L2-normalized feature vector
-            feat_p = probe_feat[i].ravel()
+            #feat_p = probe_feat[i].ravel()  #npType.ravel() 将多维数据转为1维
+            feat_p = np.asarray(probe_feat[i]).ravel()  #npType.ravel() 将多维数据转为1维
             # Ignore the probe image
             probe_imname = str(protoc['Query'][i]['imname'][0,0][0])
             probe_roi = protoc['Query'][i]['idlocate'][0,0][0].astype(np.int32)

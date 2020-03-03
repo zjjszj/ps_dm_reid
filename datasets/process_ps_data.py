@@ -227,9 +227,10 @@ class ps_data_manager:
                     pedes_Image.append(pede)
                 pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
                 q_feat.extend(model(torch.stack(pedes_list).cuda()))
-                del pedes_Image, pedes_list, batch_probes
-                gc.collect()
+                #del pedes_Image, pedes_list, batch_probes
+                #gc.collect()
         print('len(q_feat)===',len(q_feat))
+        print('q_feat===', q_feat)
         return np.asarray(q_feat)
 
     def get_gallery_det(self):
@@ -244,7 +245,7 @@ class ps_data_manager:
 
         test_roidb=gt_test_roidb()
         g_feat=[]
-        with torch.no_grad():
+        with torch.no_grad():     #没有该句，显存不够！！1.5G-> >15G
             for img in test_roidb:
                 img_Image = []
                 boxes=img['boxes']
@@ -254,10 +255,10 @@ class ps_data_manager:
                     pede_Image=image.crop(box)
                     img_Image.append(pede_Image)
                 img_list = TrainTransform()(img_Image)
-                print('len(img_list)==',len(img_list))
                 g_feat.append(model(torch.stack(img_list).cuda()))
-                del img_Image, img_list
-                gc.collect()
+                #del img_Image, img_list
+                #gc.collect()
+        print('g_feat===', g_feat)
         return np.asarray(g_feat)   #[[[tensor],...],...]
 
     def evaluate(self, model):
