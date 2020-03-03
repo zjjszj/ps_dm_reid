@@ -214,7 +214,6 @@ class BFE(nn.Module):
         triplet_feature = self.part_maxpool(x).reshape(len(x),2048)  #[N, 2048] squeeze==>reshape
         print('triplet_feature.size()==', triplet_feature.size())
         feature = self.reduction(triplet_feature)  #[N, 1024]
-        print('feature.size()===', feature.size())
         softmax_feature = self.softmax(feature)
         triplet_features.append(feature)
         softmax_features.append(softmax_feature)
@@ -226,6 +225,7 @@ class BFE(nn.Module):
             return fusion
 
         else:
+            print('predict[0].size()==', predict[0].size())
             return torch.cat(predict, 1)
 
     def get_optim_policy(self):

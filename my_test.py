@@ -34,6 +34,8 @@ if __name__ == '__main__':
     # test=psdb('test')
     # probes=test.probes
     # print(probes)
-    a=torch.tensor([2,3,4,5])
-    a=a.reshape()
-    print(a)
+    a=torch.rand((1,12))
+    c=[]
+    c.append(a)
+    d=torch.cat(c, 1)
+    print(d.size())
