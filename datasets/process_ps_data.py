@@ -226,12 +226,11 @@ class ps_data_manager:
                     pede=img.crop(box)
                     pedes_Image.append(pede)
                 pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
-                q_feat.extend(model(torch.stack(pedes_list).cuda()))
+                q_feat.extend(np.asarray(model(torch.stack(pedes_list).cuda()).cpu()))  #q_feat: list [[tensor1],...]
                 #del pedes_Image, pedes_list, batch_probes
                 #gc.collect()
         print('len(q_feat)===',len(q_feat))
-        print('q_feat===', q_feat)
-        return np.asarray(q_feat)
+        return q_feat
 
     def get_gallery_det(self):
         g_det=[]
@@ -255,11 +254,10 @@ class ps_data_manager:
                     pede_Image=image.crop(box)
                     img_Image.append(pede_Image)
                 img_list = TrainTransform()(img_Image)
-                g_feat.append(model(torch.stack(img_list).cuda()))
+                g_feat.append(np.asarray(model(torch.stack(img_list).cuda()).cpu())) #g_feat: list [[[tensor1],..],...]
                 #del img_Image, img_list
                 #gc.collect()
-        print('g_feat===', g_feat)
-        return np.asarray(g_feat)   #[[[tensor],...],...]
+        return g_feat   #[[[array],...],...]
 
     def evaluate(self, model):
         test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')

@@ -32,16 +32,9 @@ import numpy as np
 import torch.nn as nn
 if __name__ == '__main__':
     a=[]
-    a1=torch.tensor([[1,2],[3,4]])
-    a2=torch.tensor([[3,4],[2,2]])
-    a.extend(a1)
-    a.extend(a2)
+    a.extend(np.array([[2],[3]]))
+    a.extend(np.array([[2],[3]]))
     print(a)
-    b=np.asarray(a)
-    c=b.ravel()
-    print(c)
-
-
 
 
 
