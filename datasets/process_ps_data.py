@@ -151,8 +151,9 @@ class ps_data_manager:
         """
         pedes_batch_x = []
         pedes_batch_y = []
-        indexs_batch = [self.indexs[i] for i in range(i_batch * batch_size,
-            i_batch * batch_size + batch_size if i_batch * batch_size <= len(self.roidb) else len(self.roidb))]
+        start=i_batch * batch_size
+        end=i_batch * batch_size + batch_size if (i_batch * batch_size+batch_size) <= len(self.roidb) else len(self.roidb)
+        indexs_batch = [self.indexs[i] for i in range(start,end)]
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
             # print(im_name)
@@ -165,6 +166,7 @@ class ps_data_manager:
         #print('pedes_batch_x[0].size()=', pedes_batch_x[0].size()) [3, 128, 64]
         pedes_batch_x = torch.stack(pedes_batch_x)
         pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
+        print('pedes_batch_y==', pedes_batch_y)
         return pedes_batch_x, pedes_batch_y
 
     def img_process(self, im_name, boxes, gt_pids, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
@@ -261,8 +263,9 @@ class ps_data_manager:
             output = model(data.cuda()).cpu()
             # get the index of the max log-probability
             pred = output.max(1, keepdim=True)[1]
+            print('pred==', pred)
+            print('target==',target)
             correct += pred.eq(target.view_as(pred)).sum().item()
 
         rank1 = 100. * correct / len(data)
         print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, len(data), rank1))
-        return rank1

@@ -31,11 +31,9 @@ import torch
 import numpy as np
 import torch.nn as nn
 if __name__ == '__main__':
-    a=torch.rand([3,2,2])
-    print(a)
-    b=[]
-    b.extend(a)
-    print(b)
+    a=[torch.tensor([1]), torch.tensor([2]), torch.tensor([3])]
+    y=[1,2,3]
+    print(torch.stack(a))
 
 
 

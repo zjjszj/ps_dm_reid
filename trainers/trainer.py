@@ -76,8 +76,6 @@ class cls_tripletTrainer:
         print('begin...test...')
         test_batch_size=200
         acc=ps_manager.ps_test(self.model, ps_manager.get_batchData(2, test_batch_size))
-        print('test acc={:.2f}%', acc)
-        print()
 
     def _parse_data(self, inputs):
         imgs, pids, _ = inputs
