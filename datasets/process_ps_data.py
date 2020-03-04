@@ -259,11 +259,11 @@ class ps_data_manager:
         model.eval()
         correct = 0
         with torch.no_grad():
-            for data, target in test_data:
-                output = model(data.cuda()).cpu()
-                # get the index of the max log-probability
-                pred = output.max(1, keepdim=True)[1]
-                correct += pred.eq(target.view_as(pred)).sum().item()
+            data, target=test_data
+            output = model(data.cuda()).cpu()
+            # get the index of the max log-probability
+            pred = output.max(1, keepdim=True)[1]
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
         rank1 = 100. * correct / len(test_data.data)
         print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, len(test_data.data), rank1))
