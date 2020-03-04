@@ -133,40 +133,22 @@ def train(**kwargs):
     elif opt.loss == 'weight':
         embedding_criterion = Margin()
     #oim
-    # elif opt.loss=='oim':
-    #     embedding_criterion_global = OIMLoss(num_features=512, num_classes=751)
-    #     embedding_criterion_drop = OIMLoss(num_features=1024, num_classes=751)
-    elif opt.loss=='oimFusionMap':
-        embedding_criterion=OIMLoss(num_features=512,num_classes=751)
-
-    #原始的+oim
-    # def criterion(triplet_y, softmax_y, labels):   #输出向量[全局，局部]、输出得分、标签
-    #     if opt.loss=='oim':
-    #         loss= [embedding_criterion_global(triplet_y[0], labels)[0]]+\
-    #                  [embedding_criterion_drop(triplet_y[1], labels)[0]]
-    #         loss=loss[0]
-    #         #print('loss==========',loss) 6.6214
-    #     else:
-    #         losses = [embedding_criterion(output, labels)[0] for output in triplet_y] + \
-    #                      [xent_criterion(output, labels) for output in softmax_y]
-    #         loss = sum(losses)
-    #     return loss
-
-
-    ### update network.Fusion feature map 效果不好
-    # def criterion(triplet_y, labels):   #输出向量、标签
-    #     loss = embedding_criterion(triplet_y, labels)[0]
-    #     return loss
-    ###end
-
-    ##adding global and local vector.Using oim
     elif opt.loss=='oim':
-        embedding_criterion = OIMLoss(num_features=1024, num_classes=5532)  #num_classes=751 market1501
+        embedding_criterion_global = OIMLoss(num_features=512, num_classes=751)
+        embedding_criterion_drop = OIMLoss(num_features=1024, num_classes=751)
 
-    def criterion(triplet_y, labels):  # 输出向量[全局，局部]、输出得分、标签
-        losses = embedding_criterion(triplet_y, labels)[0]
-        return losses
-    ##end
+    #原始的/use oim
+    def criterion(triplet_y, softmax_y, labels):   #输出向量[全局，局部]、输出得分、标签
+        if opt.loss=='oim':
+            loss= [embedding_criterion_global(triplet_y[0], labels)[0]]+\
+                     [embedding_criterion_drop(triplet_y[1], labels)[0]]
+            loss=loss[0]
+            #print('loss==========',loss) 6.6214
+        else:
+            losses = [embedding_criterion(output, labels)[0] for output in triplet_y] + \
+                         [xent_criterion(output, labels) for output in softmax_y]
+            loss = sum(losses)
+        return loss
 
     # get optimizer
     if opt.optim == "sgd":
