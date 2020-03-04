@@ -26,7 +26,7 @@ from utils.serialization import Logger, save_checkpoint
 from utils.transforms import TestTransform, TrainTransform
 #加载ps数据集
 import random
-from datasets.process_ps_data import ps_data_manager, ps_test
+from datasets.process_ps_data import ps_data_manager
 
 
 def train(**kwargs):
