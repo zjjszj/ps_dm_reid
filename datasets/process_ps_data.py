@@ -160,13 +160,13 @@ class ps_data_manager:
             gt_pids = self.roidb[item]['gt_pids']
             pedes_x_Image, pedes_y = self.img_process(im_name, boxes, gt_pids)
             pedes_x = TrainTransform()(pedes_x_Image)
+            print('pedes_x[0].size()=', pedes_x.size())
             pedes_batch_x.extend(pedes_x)
             pedes_batch_y.extend(pedes_y)
+        print('pedes_batch_x[0].size()=', pedes_batch_x[0].size())
         pedes_batch_x = torch.stack(pedes_batch_x)
         pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
-        # print(pedes_batch_x.size())
-        # print(pedes_batch_y)
-        # print(pedes_batch_x)
+        print('pedes_batch_x.size()=', pedes_batch_x.size())
         return pedes_batch_x, pedes_batch_y
 
     def img_process(self, im_name, boxes, gt_pids, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
@@ -265,6 +265,6 @@ class ps_data_manager:
             pred = output.max(1, keepdim=True)[1]
             correct += pred.eq(target.view_as(pred)).sum().item()
 
-        rank1 = 100. * correct / len(test_data.data)
+        rank1 = 100. * correct / len(data)
         print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, len(test_data.data), rank1))
         return rank1
