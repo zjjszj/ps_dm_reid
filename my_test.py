@@ -11,9 +11,9 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 if __name__ == '__main__':
-    a=F.cross_entropy(torch.tensor([0.2,0.3,0.5]),4)
-    print(a)
-
+    a=torch.rand((1,2,1,1))
+    print(a.squeeze())
+    print(a.view(1, -1))
 
 
 
