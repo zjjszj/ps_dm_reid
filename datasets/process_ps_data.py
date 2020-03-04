@@ -153,20 +153,22 @@ class ps_data_manager:
         pedes_batch_y = []
         indexs_batch = [self.indexs[i] for i in range(i_batch * batch_size,
             i_batch * batch_size + batch_size if i_batch * batch_size <= len(self.roidb) else len(self.roidb))]
+        print('len(indexs_batch)=', len(indexs_batch))
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
             # print(im_name)
             boxes = self.roidb[item]['boxes']
             gt_pids = self.roidb[item]['gt_pids']
             pedes_x_Image, pedes_y = self.img_process(im_name, boxes, gt_pids)
+            print('len(pedes_x_Image)=', len(pedes_x_Image))
             pedes_x = TrainTransform()(pedes_x_Image)
-            print('pedes_x=', pedes_x)
             pedes_batch_x.extend(pedes_x)
             pedes_batch_y.extend(pedes_y)
-        print('pedes_batch_x[0].size()=', pedes_batch_x[0].size())
+        #print('pedes_batch_x[0].size()=', pedes_batch_x[0].size()) [3, 128, 64]
         pedes_batch_x = torch.stack(pedes_batch_x)
         pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
-        print('pedes_batch_x.size()=', pedes_batch_x.size())
+        #print('pedes_batch_x.size()=', pedes_batch_x.size())  [267, 3, 128, 64]
+        print('len(pedes_batch_y)=', len(pedes_batch_y))
         return pedes_batch_x, pedes_batch_y
 
     def img_process(self, im_name, boxes, gt_pids, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
@@ -266,5 +268,5 @@ class ps_data_manager:
             correct += pred.eq(target.view_as(pred)).sum().item()
 
         rank1 = 100. * correct / len(data)
-        print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, len(test_data.data), rank1))
+        print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, len(data), rank1))
         return rank1
