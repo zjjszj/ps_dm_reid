@@ -261,7 +261,6 @@ class ps_data_manager:
             output = model(data.cuda()).cpu()
             # get the index of the max log-probability
             pred = output.max(1, keepdim=True)[1]
-            print('pred==', pred)
             correct += pred.eq(target.view_as(pred)).sum().item()
 
         rank1 = 100. * correct / len(data)
