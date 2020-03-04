@@ -156,7 +156,6 @@ class ps_data_manager:
         indexs_batch = [self.indexs[i] for i in range(start,end)]
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
-            print(im_name)
             boxes = self.roidb[item]['boxes']
             gt_pids = self.roidb[item]['gt_pids']
             pedes_x_Image, pedes_y = self.img_process(im_name, boxes, gt_pids)
@@ -166,7 +165,6 @@ class ps_data_manager:
         #print('pedes_batch_x[0].size()=', pedes_batch_x[0].size()) [3, 128, 64]
         pedes_batch_x = torch.stack(pedes_batch_x)
         pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
-        print('pedes_batch_y==', pedes_batch_y)
         return pedes_batch_x, pedes_batch_y
 
     def img_process(self, im_name, boxes, gt_pids, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):

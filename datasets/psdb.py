@@ -482,18 +482,18 @@ class psdb(imdb):
 if __name__ == '__main__':
     #from datasets.psdb import psdb
 
-    #d = psdb('test')
-    #roidb=d.gt_roidb()
+    d = psdb('train')
+    roidb=d.gt_roidb()
 
     # print(len(roidb))
     # d=psdb('test',root_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset')
     # test=d.gt_roidb()
     #print(len(roidb))
 
-    # for img in roidb:
-    #     print(img['im_name'])
-    #     print(img['gt_pids'])
-    #     print('====================================================')
+    for img in roidb:
+        print(img['im_name'])
+        print(img['gt_pids'])
+        print('====================================================')
 
 
     #from IPython import embed; embed()       #调式时使用
@@ -518,6 +518,4 @@ if __name__ == '__main__':
     # d = psdb('test')
     # d.evaluate_search(gallery_det,gallery_feat,query_feat)
     #test _load_probes()
-    d=psdb('test')
-    probes=d._load_probes()
-    print(probes)
+
