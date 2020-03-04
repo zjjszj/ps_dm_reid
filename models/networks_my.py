@@ -201,7 +201,6 @@ class BFE(nn.Module):
             {'params': self.backbone.parameters()},
             {'params': self.res_part.parameters()},
             {'params': self.global_reduction.parameters()},
-            {'params': self.global_softmax.parameters()},
         ]
         return params
 
