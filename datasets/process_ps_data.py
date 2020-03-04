@@ -160,7 +160,7 @@ class ps_data_manager:
             gt_pids = self.roidb[item]['gt_pids']
             pedes_x_Image, pedes_y = self.img_process(im_name, boxes, gt_pids)
             pedes_x = TrainTransform()(pedes_x_Image)
-            print('pedes_x[0].size()=', pedes_x.size())
+            print('pedes_x=', pedes_x)
             pedes_batch_x.extend(pedes_x)
             pedes_batch_y.extend(pedes_y)
         print('pedes_batch_x[0].size()=', pedes_batch_x[0].size())

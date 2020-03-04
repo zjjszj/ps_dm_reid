@@ -31,14 +31,9 @@ import torch
 import numpy as np
 import torch.nn as nn
 if __name__ == '__main__':
-    a=torch.rand((3,2,2))
-    b=torch.rand((3,2,2))
-
-    c=[]
-    c.extend(a)
-    c.extend(b)
-    print(c)
-
+   a=[]
+   a.append(torch.tensor([2]))
+   print(a[0].size())
 
 
 
