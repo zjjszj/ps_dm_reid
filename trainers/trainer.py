@@ -34,7 +34,6 @@ class cls_tripletTrainer:
         batch_size = self.opt.train_batch
         nums_batch=int(len(ps_manager.indexs)/batch_size)
         for i in range(nums_batch):
-            if(i>0):break
             pedes_x, pedes_y=ps_manager.get_batchData(i,batch_size)
             self.data=pedes_x.cuda()
             self.target=pedes_y.cuda()
