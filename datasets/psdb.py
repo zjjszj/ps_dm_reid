@@ -38,19 +38,19 @@ def _compute_iou(a, b):
 
 
 #输出信息保存到文件中
-import sys
-class Logger(object):
-    def __init__(self, filename="Default.log"):
-        self.terminal = sys.stdout
-        self.log = open(filename, "a")
-
-    def write(self, message):
-        self.terminal.write(message)
-        self.log.write(message)
-
-    def flush(self):
-        pass
-sys.stdout = Logger('a.txt')
+# import sys
+# class Logger(object):
+#     def __init__(self, filename="Default.log"):
+#         self.terminal = sys.stdout
+#         self.log = open(filename, "a")
+#
+#     def write(self, message):
+#         self.terminal.write(message)
+#         self.log.write(message)
+#
+#     def flush(self):
+#         pass
+# sys.stdout = Logger('a.txt')
 
 
 class psdb(imdb):
@@ -387,7 +387,7 @@ class psdb(imdb):
                 os.makedirs(osp.dirname(dump_json))
             with open(dump_json, 'w') as f:
                 json.dump(ret, f)
-        return accs[1]
+        return accs[0]
 
     def evaluate_cls(self, detections, pid_ranks, pid_labels,
                      det_thresh=0.5):

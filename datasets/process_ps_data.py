@@ -120,27 +120,8 @@ class TrainTransform:
             ret.append(pede)
         return ret
 
-#错误的方法，使用的是test的数据
-def ps_test(model, ps_manager, nums): #nums是图像的个数
-    ps_manager.roidb=gt_test_roidb()
-    ps_manager.indexs = [i for i in range(len(ps_manager.roidb))]
-    model.eval()
-    correct = 0
-    with torch.no_grad():
-        data, target=ps_manager.get_batchData(0,nums)
-        data=data.cuda()
-        output = model(data).cpu()
-        # get the index of the max log-probability
-        pred = output.max(1, keepdim=True)[1]
-        print('pred=====',pred)
-        print('target========',target)
-        correct += pred.eq(target.view_as(pred)).sum().item()
 
-    rank1 = 100. * correct / nums
-    print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, nums, rank1))
-    ps_manager.roidb=gt_train_roidb()
-    ps_manager.indexs = [i for i in range(len(ps_manager.roidb))]
-    return rank1
+
 
 class ps_data_manager:
 
@@ -229,7 +210,6 @@ class ps_data_manager:
                 q_feat.extend(np.asarray(model(torch.stack(pedes_list).cuda()).cpu()))
                 #del pedes_Image, pedes_list, batch_probes
                 #gc.collect()
-        print('len(q_feat)===',len(q_feat))
         return q_feat  #q_feat: list [[array],...]
 
     def get_gallery_det(self):
@@ -274,4 +254,17 @@ class ps_data_manager:
         print('begin run evaluate_search() function......')
         return test.evaluate_search(g_det,g_feat,q_feat)
 
+    # 使用一批训练的数据进行测试
+    def ps_test(self, model, test_data):
+        model.eval()
+        correct = 0
+        with torch.no_grad():
+            for data, target in test_data:
+                output = model(data.cuda()).cpu()
+                # get the index of the max log-probability
+                pred = output.max(1, keepdim=True)[1]
+                correct += pred.eq(target.view_as(pred)).sum().item()
 
+        rank1 = 100. * correct / len(test_data.data)
+        print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, len(test_data.data), rank1))
+        return rank1
