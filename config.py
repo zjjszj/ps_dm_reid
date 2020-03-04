@@ -14,7 +14,7 @@ class DefaultConfig(object):
     loss = 'oim'  #triplet  oim  oimFusionMap
     optim = 'adam'
     max_epoch =10    #400
-    train_batch = 32
+    train_batch = 16
     test_batch = 32
     adjust_lr = False
     lr = 0.0001
