@@ -156,7 +156,7 @@ class ps_data_manager:
         indexs_batch = [self.indexs[i] for i in range(start,end)]
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
-            # print(im_name)
+            print(im_name)
             boxes = self.roidb[item]['boxes']
             gt_pids = self.roidb[item]['gt_pids']
             pedes_x_Image, pedes_y = self.img_process(im_name, boxes, gt_pids)
@@ -264,7 +264,6 @@ class ps_data_manager:
             # get the index of the max log-probability
             pred = output.max(1, keepdim=True)[1]
             print('pred==', pred)
-            print('target==',target)
             correct += pred.eq(target.view_as(pred)).sum().item()
 
         rank1 = 100. * correct / len(data)
