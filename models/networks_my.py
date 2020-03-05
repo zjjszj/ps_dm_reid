@@ -175,8 +175,6 @@ class BFE(nn.Module):
         )
         # global branch
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.global_softmax = nn.Linear(512, num_classes)
-        self.global_softmax.apply(weights_init_kaiming)
         self.global_reduction = copy.deepcopy(reduction)
         self.global_reduction.apply(weights_init_kaiming)
 
@@ -202,17 +200,9 @@ class BFE(nn.Module):
         x = self.backbone(x)
         x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]
 
-        predict = []
-        triplet_features = []
-        softmax_features = []
-
         # global branch
         glob = self.global_avgpool(x)  # [2048,1,1]
         global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 512]  #squeeze()==>view
-        global_softmax_class = self.global_softmax(global_triplet_feature)
-        softmax_features.append(global_softmax_class)
-        triplet_features.append(global_triplet_feature)
-        predict.append(global_triplet_feature)
 
         # part branch
         x = self.res_part2(x)
@@ -239,13 +229,8 @@ class BFE(nn.Module):
             {'params': self.backbone.parameters()},
             {'params': self.res_part.parameters()},
             {'params': self.global_reduction.parameters()},
-            {'params': self.global_softmax.parameters()},
-            {'params': self.res_part2.parameters()},
-            {'params': self.reduction.parameters()},
-            {'params': self.softmax.parameters()},
         ]
         return params
-
 
 class Resnet(nn.Module):
     def __init__(self, num_classes, resnet=None):
