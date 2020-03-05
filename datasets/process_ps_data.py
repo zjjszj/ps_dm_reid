@@ -122,7 +122,7 @@ class TrainTransform:
     def __call__(self, x):  #x:[pede,...]
         ret=[]
         for pede in x:
-            pede = T.Resize((128, 64))(pede)
+            pede = T.Resize((256, 128))(pede)
             pede = T.RandomHorizontalFlip()(pede)
             pede = T.ToTensor()(pede)
             pede = T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(pede)

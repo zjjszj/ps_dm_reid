@@ -185,7 +185,7 @@ class BFE(nn.Module):
         :return: (prediction, triplet_losses, softmax_losses)
         """
         x = self.backbone(x)
-        x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]
+        x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]=>[32, 2048, 48, 16]
         x = self.res_part2(x)
 
         # global branch
