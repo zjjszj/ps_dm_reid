@@ -68,7 +68,7 @@ def _load(fname, output_dir):
     return unpickle(fpath)
 
 def gt_train_roidb():
-    #cache_file = 'E:/data/cache/psdb_train_gt_roidb.pkl'  #项目的根目录  用于pycharm
+    #cache_file = r'E:/AI/data/cache/psdb_train_gt_roidb.pkl'
     cache_file = '/kaggle/input/psdb-train-roidb/psdb_train_gt_roidb.pkl'  #项目的根目录   用于kaggle
     if osp.isfile(cache_file):
         roidb = unpickle(cache_file)
@@ -81,7 +81,8 @@ def gt_test_roidb():
         roidb = unpickle(cache_file)
         return roidb
 
-def read_pedeImage(im_name, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+def read_pedeImage(im_name, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):  #r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset\Image\SSM'
+
     got_img = False
     img_path=osp.join(img_dir, im_name)
     while not got_img:
@@ -131,30 +132,26 @@ class TrainTransform:
 
 
 class ps_data_manager(ps_data):
-    def __init__(self):
+    def __init__(self, data):
         super(ps_data_manager, self).__init__()
 
-        self._roidb=gt_train_roidb()
-        self._roidb_indexs=[i for i in range(len(self._roidb))]
-        #self._train_pedes=get_train_pedes()
-        #self._train_pedes_indexs=[i for i in range(len(self._train_pedes))]
+        if data=='train_pedes':
+            self._train_data=get_train_pedes()
+        elif data=='train_roidb':
+            self._train_data=gt_train_roidb()
+        self.indexs=[i for i in range(len(self._train_data))]
 
     def pids_to_label(self):
         # 制作label
         pids_container = set()
-        for i in range(len(self.roidb)):
-            img = self.roidb[i]
+        for i in range(len(self.train_data)):
+            img = self.train_data[i]
             img_gt_pids = img['gt_pids']
             for j in range(len(img_gt_pids)):
                 if img_gt_pids[j] != -1:
                     pids_container.add(img_gt_pids[j])
         pid2label = {pid: label for label, pid in enumerate(pids_container)}
         return pid2label
-
-    # def set_attr(self):
-    #     self.roidb = gt_train_roidb()
-    #     #self.pids2label = self.pids_to_label()
-    #     self.indexs = [i for i in range(len(self.roidb))]
 
     def get_batchData(self, i_batch, batch_size):
         """
@@ -166,12 +163,12 @@ class ps_data_manager(ps_data):
         pedes_batch_x = []
         pedes_batch_y = []
         start=i_batch * batch_size
-        end=i_batch * batch_size + batch_size if (i_batch * batch_size+batch_size) <= len(self.roidb) else len(self.roidb)
-        indexs_batch = [self.roidb_indexs[i] for i in range(start,end)]
+        end=i_batch * batch_size + batch_size if (i_batch * batch_size+batch_size) <= len(self.train_data) else len(self.train_data)
+        indexs_batch = [self.indexs[i] for i in range(start,end)]
         for item in indexs_batch:
-            im_name = self.roidb[item]['im_name']
-            boxes = self.roidb[item]['boxes']
-            gt_pids = self.roidb[item]['gt_pids']
+            im_name = self.train_data[item]['im_name']
+            boxes = self.train_data[item]['boxes']
+            gt_pids = self.train_data[item]['gt_pids']
             pedes_x_Image, pedes_y = self.img_process(im_name, boxes, gt_pids)
             pedes_x = TrainTransform()(pedes_x_Image)
             pedes_batch_x.extend(pedes_x)
@@ -181,22 +178,22 @@ class ps_data_manager(ps_data):
         pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
         return pedes_batch_x, pedes_batch_y
 
-    def get_batchData_pedes(self, i_batch, batch_size):
+    def get_batchData_pedes(self, i_batch, nums_pedes):
         """
         from datasets psdb_train_pedes.pkl. get batch_size images per time. convert those images to pedes for model inputs.
         :param i_batch: index of batch
         :param batch_size:
         :return:
         """
-        start=i_batch * batch_size
-        end=i_batch * batch_size + batch_size if (i_batch * batch_size+batch_size) <= len(self.train_pedes) else len(self.train_pedes)
-        indexs_batch = [self.train_pedes_indexs[i] for i in range(start,end)]
+        start=i_batch * nums_pedes
+        end=i_batch * nums_pedes + nums_pedes if (i_batch * nums_pedes+nums_pedes) <= len(self.train_data) else len(self.train_data)
+        indexs_batch = [self.indexs[i] for i in range(start,end)]
         pedes_Image = []
         pedes_y = []
         for item in indexs_batch:
-            im_names = self.train_pedes[item]['im_name']
-            boxes = self.train_pedes[item]['boxes']
-            pid = self.train_pedes[item]['pid']
+            im_names = self.train_data[item]['im_name']
+            boxes = self.train_data[item]['boxes']
+            pid = self.train_data[item]['pid']
             for i in range(len(im_names)):
                 im_name=im_names[i]
                 box=boxes[i]

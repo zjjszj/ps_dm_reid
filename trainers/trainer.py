@@ -30,11 +30,11 @@ class cls_tripletTrainer:
         len(data_loader)都换成nums_batch
         """
         # 打乱顺序
-        random.shuffle(ps_manager.roidb_indexs)
-        batch_size = self.opt.train_batch
-        nums_batch=int(len(ps_manager.roidb_indexs)/batch_size)
+        random.shuffle(ps_manager.indexs)
+        nums_pedes = self.opt.nums_pedes
+        nums_batch=int(len(ps_manager.indexs)/nums_pedes)
         for i in range(nums_batch):
-            pedes_x, pedes_y=ps_manager.get_batchData(i,batch_size)
+            pedes_x, pedes_y=ps_manager.get_batchData_pedes(i,nums_pedes)
             self.data=pedes_x.cuda()
             self.target=pedes_y.cuda()
         #for i, inputs in enumerate(data_loader):
@@ -74,8 +74,8 @@ class cls_tripletTrainer:
               .format(epoch, batch_time.sum, losses.mean, param_group[0]['lr']))
         print()
         print('begin...test...')
-        test_batch_size=200
-        acc=ps_manager.ps_test(self.model, ps_manager.get_batchData(2, test_batch_size))
+        test_nums_pedes=100
+        acc=ps_manager.ps_test(self.model, ps_manager.nums_pedes(2, test_nums_pedes))
 
     def _parse_data(self, inputs):
         imgs, pids, _ = inputs

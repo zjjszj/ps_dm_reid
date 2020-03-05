@@ -55,8 +55,7 @@ def train(**kwargs):
     summary_writer = SummaryWriter(osp.join(opt.save_dir, 'tensorboard_log'))
 
     ##加载训练数据集
-    ps_manager=ps_data_manager()
-    #ps_manager.set_attr()
+    ps_manager=ps_data_manager('train_pedes')
 
     print('initializing model ...')
     model = BFE(5532, 1.0, 0.33)  # dataset.num_train_pids
