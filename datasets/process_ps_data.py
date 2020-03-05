@@ -202,7 +202,7 @@ class ps_data_manager(ps_data):
                 pedes_y.append(pid)
         pedes_x = TrainTransform()(pedes_Image)
         pedes_batch_x = torch.stack(pedes_x)
-        return pedes_batch_x, pedes_y
+        return pedes_batch_x, torch.tensor(pedes_y)
 
     def img_process(self, im_name, boxes, gt_pids):
         """
