@@ -225,7 +225,7 @@ class BFE(nn.Module):
             return fusion_feature
 
         else:
-            return fusion_softmax         #torch.cat(predict, 1) used to evaluate
+            return fusion_feature         #torch.cat(predict, 1) used to evaluate
 
     def get_optim_policy(self):
         params = [

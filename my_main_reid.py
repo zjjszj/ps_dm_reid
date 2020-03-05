@@ -15,8 +15,8 @@ from config import opt
 from datasets import data_manager
 from datasets.data_loader import ImageData
 from datasets.samplers import RandomIdentitySampler
-#from models.networks import ResNetBuilder, IDE, Resnet, BFE
-from models.networks_my import ResNetBuilder, IDE, Resnet, BFE
+from models.networks import ResNetBuilder, IDE, Resnet, BFE
+#from models.networks_my import ResNetBuilder, IDE, Resnet, BFE
 from trainers.evaluator import ResNetEvaluator
 from trainers.trainer import cls_tripletTrainer
 from utils.loss import CrossEntropyLabelSmooth, TripletLoss, Margin, OIMLoss
@@ -107,7 +107,7 @@ def train(**kwargs):
 
     ##adding global and local vector.Using oim
     elif opt.loss=='oim':
-        embedding_criterion = OIMLoss(num_features=256, num_classes=5532)  #num_classes=751 market1501
+        embedding_criterion = OIMLoss(num_features=1024, num_classes=5532)  #num_classes=751 market1501
 
     def criterion(triplet_y, labels):  # 输出向量[全局，局部]、输出得分、标签
         losses = embedding_criterion(triplet_y, labels)[0]
