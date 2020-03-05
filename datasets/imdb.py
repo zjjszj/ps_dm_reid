@@ -17,6 +17,8 @@ import scipy.sparse
 #from utils.config import cfg
 #import pdb
 
+
+
 ROOT_DIR = osp.join(osp.dirname(__file__), '..', '..')
 
 class imdb(object):
