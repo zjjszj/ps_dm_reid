@@ -136,8 +136,8 @@ class ps_data_manager(ps_data):
 
         self._roidb=gt_train_roidb()
         self._roidb_indexs=[i for i in range(len(self._roidb))]
-        self._train_pedes=get_train_pedes()
-        self._train_pedes_indexs=[i for i in range(len(self._train_pedes))]
+        #self._train_pedes=get_train_pedes()
+        #self._train_pedes_indexs=[i for i in range(len(self._train_pedes))]
 
     def pids_to_label(self):
         # 制作label
@@ -189,14 +189,14 @@ class ps_data_manager(ps_data):
         :return:
         """
         start=i_batch * batch_size
-        end=i_batch * batch_size + batch_size if (i_batch * batch_size+batch_size) <= len(self.roidb) else len(self.roidb)
-        indexs_batch = [self.roidb_indexs[i] for i in range(start,end)]
+        end=i_batch * batch_size + batch_size if (i_batch * batch_size+batch_size) <= len(self.train_pedes) else len(self.train_pedes)
+        indexs_batch = [self.train_pedes_indexs[i] for i in range(start,end)]
         pedes_Image = []
         pedes_y = []
         for item in indexs_batch:
-            im_names = self.roidb[item]['im_name']
-            boxes = self.roidb[item]['boxes']
-            pid = self.roidb[item]['pid']
+            im_names = self.train_pedes[item]['im_name']
+            boxes = self.train_pedes[item]['boxes']
+            pid = self.train_pedes[item]['pid']
             for i in range(len(im_names)):
                 im_name=im_names[i]
                 box=boxes[i]

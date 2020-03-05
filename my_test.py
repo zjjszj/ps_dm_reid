@@ -24,7 +24,6 @@ import numpy as np
 import torch.nn.functional as F
 if __name__ == '__main__':
     ps_manager=ps_data_manager()
-    ps_manager.set_attr()
     x, y=ps_manager.get_batchData_pedes(0, 3)
     print(x)
     print(y)
