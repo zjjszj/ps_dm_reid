@@ -23,7 +23,11 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 if __name__ == '__main__':
-    a=[2]
+    ps_manager=ps_data_manager()
+    x, y=ps_manager.get_batchData_pedes(0, 3)
+    print(x)
+    print(y)
+
 
 
 
