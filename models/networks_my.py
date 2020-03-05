@@ -168,6 +168,7 @@ class BFE(nn.Module):
             Bottleneck(2048, 512),
         )
         self.res_part.load_state_dict(resnet.layer4.state_dict())
+        self.res_part2 = Bottleneck(2048, 512)
         reduction = nn.Sequential(
             nn.Conv2d(2048, 512, 1),
             nn.BatchNorm2d(512),
@@ -185,9 +186,9 @@ class BFE(nn.Module):
         """
         x = self.backbone(x)
         x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]
+        x = self.res_part2(x)
 
         # global branch
-        softmax_features=[]
         glob = self.global_avgpool(x)  # [2048,1,1]
         global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 512]  #squeeze()==>view
 
@@ -201,6 +202,7 @@ class BFE(nn.Module):
             {'params': self.backbone.parameters()},
             {'params': self.res_part.parameters()},
             {'params': self.global_reduction.parameters()},
+            {'params': self.res_part2.parameters()},
         ]
         return params
 
