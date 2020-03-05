@@ -12,7 +12,7 @@ class DefaultConfig(object):
     mode = 'retrieval'
     # optimization options
     loss = 'oim'  #triplet  oim  oimFusionMap
-    optim = 'adam'
+    optim = 'sgd'  #adam
     max_epoch =10    #400
     train_batch = 16
     nums_pedes=16
