@@ -298,11 +298,8 @@ class ps_data_manager(ps_data):
         with torch.no_grad():
             data, target=test_data
             output = model(data.cuda()).cpu()
-            print('output.size()==', output.size())
             # get the index of the max log-probability
             pred = output.max(1, keepdim=True)[1]
-            print('pred==', pred)
-            print('target==', target)
             correct += pred.eq(target.view_as(pred)).sum().item()
 
         rank1 = 100. * correct / len(data)
