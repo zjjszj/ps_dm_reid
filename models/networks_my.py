@@ -170,8 +170,8 @@ class BFE(nn.Module):
         self.res_part.load_state_dict(resnet.layer4.state_dict())
         self.res_part2 = Bottleneck(2048, 512)
         reduction = nn.Sequential(
-            nn.Conv2d(2048, 512, 1),
-            nn.BatchNorm2d(512),
+            nn.Conv2d(2048, 256, 1),
+            nn.BatchNorm2d(256),
             nn.ReLU()
         )
         # global branch
@@ -190,7 +190,7 @@ class BFE(nn.Module):
 
         # global branch
         glob = self.global_avgpool(x)  # [2048,1,1]
-        global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 512]  #squeeze()==>view
+        global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 256]  #squeeze()==>view
 
         if self.training:
             return global_triplet_feature
