@@ -30,9 +30,9 @@ class cls_tripletTrainer:
         len(data_loader)都换成nums_batch
         """
         # 打乱顺序
-        random.shuffle(ps_manager.indexs)
+        random.shuffle(ps_manager.roidb_indexs)
         batch_size = self.opt.train_batch
-        nums_batch=int(len(ps_manager.indexs)/batch_size)
+        nums_batch=int(len(ps_manager.roidb_indexs)/batch_size)
         for i in range(nums_batch):
             pedes_x, pedes_y=ps_manager.get_batchData(i,batch_size)
             self.data=pedes_x.cuda()

@@ -80,7 +80,7 @@ class psdb(imdb):
         return image_path
 
     def gt_roidb(self):
-        cache_file = osp.join(self.cache_path, self.name + '_gt_roidb.pkl')
+        cache_file = osp.join(self.cache_path, self.name + '_gt_roidb.pkl')  #cache_path:E:\AI\data\cache
         if osp.isfile(cache_file):
             roidb = unpickle(cache_file)
             return roidb
@@ -155,6 +155,7 @@ class psdb(imdb):
             pieces[1::2] = map(int, pieces[1::2])  # 将数字部分转成整数
             return pieces
         self.image_index.sort(key=sort_key)
+        print(self.image_index)
         for im_name in self.image_index:         #im_name:图像名
             boxes = name_to_boxes[im_name]
             boxes[:, 2] += boxes[:, 0]
@@ -473,28 +474,84 @@ class psdb(imdb):
             'annotation/test/train_test/TestG50.mat'))['TestG50'].squeeze()
         probes = []
         for item in protoc['Query']:
-            im_name = osp.join(self._data_path, str(item['imname'][0,0][0]))
+            #im_name = osp.join(self._data_path, str(item['imname'][0,0][0]))
+            im_name = str(item['imname'][0,0][0])
             roi = item['idlocate'][0,0][0].astype(np.int32)
             roi[2:] += roi[:2]
             probes.append((im_name, roi))
         return probes
 
+    def pede_train_data(self):
+        """
+        generate train data: {{'pid':pid, 'im_name':im_name, 'boxes':boxes},...}
+        :return: train data
+        """
+        cache_file = osp.join(self.cache_path, self.name + '_pedes.pkl')
+        if osp.isfile(cache_file):
+            psdb_train_pedes = unpickle(cache_file)
+            return psdb_train_pedes
+        train_roidb = self.roidb
+        pede_train_data=[]
+        for i in range(5532):
+            pid_imnames = []
+            pid_boxes = []
+            for img in train_roidb:
+                im_name=img['im_name']
+                boxes=img['boxes']
+                pids=img['gt_pids']
+                for j in range(len(pids)):
+                    if pids[j]==i:
+                        pid_imnames.append(im_name)
+                        pid_boxes.append(boxes[j])
+                        break
+            pid_boxes=np.asarray(pid_boxes)
+            pid_boxes=pid_boxes.reshape(pid_boxes.shape[0], 4)
+            pede_train_data.append({
+                'pid': i,
+                'im_name': pid_imnames,
+                'boxes': pid_boxes
+            })
+        pickle(pede_train_data, cache_file)   #E:\AI\data\cache
+        return pede_train_data
+
+    def pids_to_label(self):
+        # 制作label
+        pids_container = set()
+        for i in range(len(self.roidb)):
+            img = self.roidb[i]
+            img_gt_pids = img['gt_pids']
+            for j in range(len(img_gt_pids)):
+                if img_gt_pids[j] != -1:
+                    pids_container.add(img_gt_pids[j])
+        for i in pids_container:
+            print(i)
+
+
+
+
+
 if __name__ == '__main__':
     #from datasets.psdb import psdb
 
-    d = psdb('train')
-    roidb=d.gt_roidb()
+    train = psdb('train')
+    train_pedes=train.pede_train_data()
+    for pede in train_pedes:
+        print(pede['pid'])
+        print(pede['im_name'])
+        print(pede['boxes'])
+        print('===========')
+
 
     # print(len(roidb))
     # d=psdb('test',root_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset')
     # test=d.gt_roidb()
     #print(len(roidb))
 
-    for img in roidb:
-        print(img['im_name'])
-        print(img['gt_pids'])
-        print('====================================================')
-
+    # for img in roidb:
+    #     print(img['im_name'])
+    #     print(img['boxes'])
+    #     print(img['gt_pids'])
+    #     print('====================================================')
 
     #from IPython import embed; embed()       #调式时使用
 
@@ -517,5 +574,9 @@ if __name__ == '__main__':
     # query_feat=np.array([[0.11,0.22,0.33,0.44]])
     # d = psdb('test')
     # d.evaluate_search(gallery_det,gallery_feat,query_feat)
+
     #test _load_probes()
+
+    #test 'Person.mat'
+
 

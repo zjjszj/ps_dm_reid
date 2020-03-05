@@ -12,6 +12,8 @@ import sys
 import errno
 import os
 import gc
+from datasets.ps_data import ps_data
+
 
 class Cutout(object):
     def __init__(self, probability=0.5, size=64, mean=[0.4914, 0.4822, 0.4465]):
@@ -79,8 +81,9 @@ def gt_test_roidb():
         roidb = unpickle(cache_file)
         return roidb
 
-def read_pedeImage(img_path):
+def read_pedeImage(im_name, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
     got_img = False
+    img_path=osp.join(img_dir, im_name)
     while not got_img:
         try:
             img = Image.open(img_path).convert('RGB')
@@ -89,6 +92,12 @@ def read_pedeImage(img_path):
             print("IOError incurred when reading '{}'. Will redo. Don't worry. Just chill.".format(img_path))
             pass
     return img
+
+def get_train_pedes():
+    cache_file = r'E:/AI/data/cache/psdb_train_pedes.pkl'
+    if osp.isfile(cache_file):
+        train_pedes = unpickle(cache_file)
+        return train_pedes
 
 # class PS_Data(Dataset):
 #     def __init__(self, dataset, transform):
@@ -121,14 +130,14 @@ class TrainTransform:
         return ret
 
 
+class ps_data_manager(ps_data):
+    def __init__(self):
+        super(ps_data_manager, self).__init__()
 
-
-class ps_data_manager:
-
-    def set_attr(self):
-        self.roidb = gt_train_roidb()
-        #self.pids2label = self.pids_to_label()
-        self.indexs = [i for i in range(len(self.roidb))]
+        self._roidb=gt_train_roidb()
+        self._roidb_indexs=[i for i in range(len(self._roidb))]
+        self._train_pedes=get_train_pedes()
+        self._train_pedes_indexs=[i for i in range(len(self._train_pedes))]
 
     def pids_to_label(self):
         # 制作label
@@ -142,9 +151,14 @@ class ps_data_manager:
         pid2label = {pid: label for label, pid in enumerate(pids_container)}
         return pid2label
 
+    # def set_attr(self):
+    #     self.roidb = gt_train_roidb()
+    #     #self.pids2label = self.pids_to_label()
+    #     self.indexs = [i for i in range(len(self.roidb))]
+
     def get_batchData(self, i_batch, batch_size):
         """
-        get batch_size images per time. convert those images to pedes for model inputs.
+        from datasets psdb_train_gt_roidb. batch_size images per time. convert those images to pedes for model inputs.
         :param i_batch: index of batch
         :param batch_size:
         :return:
@@ -153,7 +167,7 @@ class ps_data_manager:
         pedes_batch_y = []
         start=i_batch * batch_size
         end=i_batch * batch_size + batch_size if (i_batch * batch_size+batch_size) <= len(self.roidb) else len(self.roidb)
-        indexs_batch = [self.indexs[i] for i in range(start,end)]
+        indexs_batch = [self.roidb_indexs[i] for i in range(start,end)]
         for item in indexs_batch:
             im_name = self.roidb[item]['im_name']
             boxes = self.roidb[item]['boxes']
@@ -167,7 +181,33 @@ class ps_data_manager:
         pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
         return pedes_batch_x, pedes_batch_y
 
-    def img_process(self, im_name, boxes, gt_pids, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset/Image/SSM'):
+    def get_batchData_pedes(self, i_batch, batch_size):
+        """
+        from datasets psdb_train_pedes.pkl. get batch_size images per time. convert those images to pedes for model inputs.
+        :param i_batch: index of batch
+        :param batch_size:
+        :return:
+        """
+        start=i_batch * batch_size
+        end=i_batch * batch_size + batch_size if (i_batch * batch_size+batch_size) <= len(self.roidb) else len(self.roidb)
+        indexs_batch = [self.roidb_indexs[i] for i in range(start,end)]
+        pedes_Image = []
+        pedes_y = []
+        for item in indexs_batch:
+            im_names = self.roidb[item]['im_name']
+            boxes = self.roidb[item]['boxes']
+            pid = self.roidb[item]['pid']
+            for i in range(len(im_names)):
+                im_name=im_names[i]
+                box=boxes[i]
+                pede=read_pedeImage(im_name).crop(box)
+                pedes_Image.append(pede)
+                pedes_y.append(pid)
+        pedes_x = TrainTransform()(pedes_Image)
+        pedes_batch_x = torch.stack(pedes_x)
+        return pedes_batch_x, pedes_y
+
+    def img_process(self, im_name, boxes, gt_pids):
         """
 
         :param im_name: image name
@@ -178,7 +218,7 @@ class ps_data_manager:
         """
         pedes_x = []
         pedes_y = []
-        image = read_pedeImage(osp.join(img_dir, im_name))
+        image = read_pedeImage(im_name)
         for i in range(len(gt_pids)):
             if gt_pids[i] != -1:
                 boxe = boxes[i]
@@ -189,7 +229,7 @@ class ps_data_manager:
 
     def get_query_feat(self, model):
         q_feat=[]
-        test = psdb('test', root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset')
+        test = psdb('test')
         probes = test.probes  #[(img_path,box)...]
         batch_size=16
         with torch.no_grad():
@@ -199,9 +239,9 @@ class ps_data_manager:
                 batch_probes=probes[start:end]
                 pedes_Image=[]
                 for probe in batch_probes:
-                    img_path=probe[0]
+                    im_name=probe[0]
                     box=probe[1]
-                    img=read_pedeImage(img_path)
+                    img=read_pedeImage(im_name)
                     pede=img.crop(box)
                     pedes_Image.append(pede)
                 pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
