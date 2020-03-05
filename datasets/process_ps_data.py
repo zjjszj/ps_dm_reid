@@ -95,7 +95,7 @@ def read_pedeImage(im_name, img_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx
     return img
 
 def get_train_pedes():
-    cache_file = r'E:/AI/data/cache/psdb_train_pedes.pkl'
+    cache_file = r'/kaggle/input/psdb-train-pedes/psdb_train_pedes.pkl'   #r'E:/AI/data/cache/psdb_train_pedes.pkl'
     if osp.isfile(cache_file):
         train_pedes = unpickle(cache_file)
         return train_pedes
