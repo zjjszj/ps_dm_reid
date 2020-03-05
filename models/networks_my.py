@@ -169,8 +169,8 @@ class BFE(nn.Module):
         )
         self.res_part.load_state_dict(resnet.layer4.state_dict())
         reduction = nn.Sequential(
-            nn.Conv2d(2048, 1024, 1),  # 512改为1024
-            nn.BatchNorm2d(1024),
+            nn.Conv2d(2048, 512, 1),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
         # global branch

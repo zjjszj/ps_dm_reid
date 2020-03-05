@@ -72,10 +72,11 @@ class cls_tripletTrainer:
         print('Epoch: [{}]\tEpoch Time {:.3f} s\tLoss {:.3f}\t'
               'Lr {:.2e}'
               .format(epoch, batch_time.sum, losses.mean, param_group[0]['lr']))
-        print()
-        print('begin...test...')
-        test_nums_pedes=100
-        acc=ps_manager.ps_test(self.model, ps_manager.get_batchData_pedes(2, test_nums_pedes))
+
+        #test测评效果不好
+        #print('begin...test...')
+        # test_nums_pedes=100
+        # acc=ps_manager.ps_test(self.model, ps_manager.get_batchData_pedes(2, test_nums_pedes))
 
     def _parse_data(self, inputs):
         imgs, pids, _ = inputs

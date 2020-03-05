@@ -152,7 +152,7 @@ def oim(inputs, targets, lut, momentum=0.5):
 
 
 class OIMLoss(nn.Module):
-    def __init__(self, num_features, num_classes, scalar=1.0, momentum=0.5,
+    def __init__(self, num_features, num_classes, scalar=10, momentum=0.5,  #1.0=>10
                  weight=None, reduction='mean'):
         super(OIMLoss, self).__init__()
         self.num_features = num_features

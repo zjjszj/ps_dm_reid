@@ -534,24 +534,21 @@ if __name__ == '__main__':
     #from datasets.psdb import psdb
 
     train = psdb('train')
-    train_pedes=train.pede_train_data()
-    for pede in train_pedes:
-        print(pede['pid'])
-        print(pede['im_name'])
-        print(pede['boxes'])
-        print('===========')
-
+    roidb=train.gt_roidb()
+    for img in roidb:
+        pids=img['gt_pids']
+        boxes=img['boxes']
+        for i in range(len(pids)):
+            if pids[i]!=-1:
+                print(img['im_name'])
+                print('hight=', boxes[i][3]-boxes[i][1], 'width=', boxes[i][2]-boxes[i][0])
 
     # print(len(roidb))
     # d=psdb('test',root_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset')
     # test=d.gt_roidb()
     #print(len(roidb))
 
-    # for img in roidb:
-    #     print(img['im_name'])
-    #     print(img['boxes'])
-    #     print(img['gt_pids'])
-    #     print('====================================================')
+
 
     #from IPython import embed; embed()       #调式时使用
 

@@ -15,8 +15,8 @@ from config import opt
 from datasets import data_manager
 from datasets.data_loader import ImageData
 from datasets.samplers import RandomIdentitySampler
-from models.networks import ResNetBuilder, IDE, Resnet, BFE
-#from models.networks_my import ResNetBuilder, IDE, Resnet, BFE
+#from models.networks import ResNetBuilder, IDE, Resnet, BFE
+from models.networks_my import ResNetBuilder, IDE, Resnet, BFE
 from trainers.evaluator import ResNetEvaluator
 from trainers.trainer import cls_tripletTrainer
 from utils.loss import CrossEntropyLabelSmooth, TripletLoss, Margin, OIMLoss
@@ -166,22 +166,23 @@ def train(**kwargs):
         #         filename='checkpoint_ep' + str(epoch + 1) + '.pth.tar')
 
         #skip if not save model
-    #     if opt.eval_step > 0 and (epoch + 1) % opt.eval_step == 0 or (epoch + 1) == opt.max_epoch:
-    #         rank1 = ps_manager.evaluate(model)
-    #         is_best = rank1 > best_rank1
-    #         if is_best:
-    #             best_rank1 = rank1
-    #             best_epoch = epoch + 1
-    #
-    #         if use_gpu:
-    #             state_dict = model.module.state_dict()
-    #         else:
-    #             state_dict = model.state_dict()
-    #         save_checkpoint({'state_dict': state_dict, 'epoch': epoch + 1},
-    #             is_best=is_best, save_dir=opt.save_dir,
-    #             filename='checkpoint_ep' + str(epoch + 1) + '.pth.tar')
-    #
-    # print('Best rank-1 {:.1%}, achived at epoch {}'.format(best_rank1, best_epoch))
+        if opt.eval_step > 0 and (epoch + 1) % opt.eval_step == 0 or (epoch + 1) == opt.max_epoch:
+            rank1 = ps_manager.evaluate(model)
+            is_best = rank1 > best_rank1
+            if is_best:
+                best_rank1 = rank1
+                best_epoch = epoch + 1
+
+            if use_gpu:
+                state_dict = model.module.state_dict()
+            else:
+                pass
+            #     state_dict = model.state_dict()
+            # save_checkpoint({'state_dict': state_dict, 'epoch': epoch + 1},
+            #     is_best=is_best, save_dir=opt.save_dir,
+            #     filename='checkpoint_ep' + str(epoch + 1) + '.pth.tar')
+
+    print('Best rank-1 {:.1%}, achived at epoch {}'.format(best_rank1, best_epoch))
 
 def test(model, queryloader):
     model.eval()
