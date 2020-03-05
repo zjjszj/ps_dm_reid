@@ -26,6 +26,7 @@ if __name__ == '__main__':
     ps_manager=ps_data_manager()
     x, y=ps_manager.get_batchData_pedes(0, 3)
     print(x)
+    
     print(y)
 
 
