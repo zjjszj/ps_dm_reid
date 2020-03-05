@@ -75,7 +75,7 @@ class cls_tripletTrainer:
         print()
         print('begin...test...')
         test_nums_pedes=100
-        acc=ps_manager.ps_test(self.model, ps_manager.nums_pedes(2, test_nums_pedes))
+        acc=ps_manager.ps_test(self.model, ps_manager.get_batchData_pedes(2, test_nums_pedes))
 
     def _parse_data(self, inputs):
         imgs, pids, _ = inputs

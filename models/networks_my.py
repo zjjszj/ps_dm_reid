@@ -190,7 +190,6 @@ class BFE(nn.Module):
         global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 1024]  #squeeze()==>view
 
         if self.training:
-            print('global_triplet_feature=',global_triplet_feature)
             return global_triplet_feature
 
         else:
