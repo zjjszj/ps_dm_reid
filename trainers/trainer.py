@@ -51,7 +51,7 @@ class cls_tripletTrainer:
             losses.update(self.loss.item())
 
             # tensorboard
-            #global_step = epoch * len(data_loader) + i
+            #global_step = epoch * len(data_loader) + i  #每批次显示
             global_step = epoch * nums_batch + i
             self.summary_writer.add_scalar('loss', self.loss.item(), global_step)
             self.summary_writer.add_scalar('lr', self.optimizer.param_groups[0]['lr'], global_step)
