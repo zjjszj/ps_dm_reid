@@ -218,13 +218,14 @@ class BFE(nn.Module):
         softmax_features.append(softmax_feature)
         predict.append(feature)
         ##融合全局和drop局部特征向量
-        fusion=(global_triplet_feature+feature)/2
+        fusion_feature=(global_triplet_feature+feature)/2
+        fusion_softmax=(global_softmax_class+softmax_feature)/2
         if self.training:
             #return triplet_features, softmax_features
-            return fusion
+            return fusion_feature
 
         else:
-            return torch.cat(predict, 1)
+            return fusion_softmax         #torch.cat(predict, 1) used to evaluate
 
     def get_optim_policy(self):
         params = [

@@ -176,6 +176,8 @@ class BFE(nn.Module):
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.global_reduction = copy.deepcopy(reduction)
         self.global_reduction.apply(weights_init_kaiming)
+        self.global_softmax = nn.Linear(1024, num_classes)  #512改为1024
+        self.global_softmax.apply(weights_init_kaiming)
 
     def forward(self, x):
         """
@@ -186,14 +188,17 @@ class BFE(nn.Module):
         x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]
 
         # global branch
+        softmax_features=[]
         glob = self.global_avgpool(x)  # [2048,1,1]
         global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 1024]  #squeeze()==>view
+        global_softmax_class = self.global_softmax(global_triplet_feature)
+        softmax_features.append(global_softmax_class)
 
         if self.training:
             return global_triplet_feature
 
         else:
-            return global_triplet_feature
+            return softmax_features
 
     def get_optim_policy(self):
         params = [
