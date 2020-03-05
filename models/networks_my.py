@@ -145,7 +145,7 @@ class ResNetBuilder(nn.Module):
             ]
 
 
-
+#只使用全局分支
 class BFE(nn.Module):
     def __init__(self, num_classes, width_ratio=0.5, height_ratio=0.5):
         super(BFE, self).__init__()
@@ -187,15 +187,14 @@ class BFE(nn.Module):
         x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]
 
         # global branch
+        softmax_features=[]
         glob = self.global_avgpool(x)  # [2048,1,1]
         global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 512]  #squeeze()==>view
 
         if self.training:
-            return triplet_features, softmax_features
-            #return fusion_feature
-
+            return global_triplet_feature
         else:
-            return torch.cat(predict, 1)
+            return global_triplet_feature
 
     def get_optim_policy(self):
         params = [
