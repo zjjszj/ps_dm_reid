@@ -126,14 +126,16 @@ def train(**kwargs):
     reid_trainer = cls_tripletTrainer(opt, model, optimizer, criterion, summary_writer)
 
     def adjust_lr(optimizer, ep):
-        if ep < 50:
-            lr = 1e-4*(ep//5+1)
+        for p in optimizer.param_groups:
+            lr=p['lr']
+        if ep < 11:
+            lr = lr-0.00009
         elif ep < 200:
             lr = 1e-3
         elif ep < 300:
             lr = 1e-4
         else:
-            lr = 1e-5
+            lr = 1e-4
         for p in optimizer.param_groups:
             p['lr'] = lr
 
