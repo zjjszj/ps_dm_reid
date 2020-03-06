@@ -54,7 +54,7 @@ def _compute_iou(a, b):
 
 
 class psdb(imdb):
-    def __init__(self, image_set, root_dir=r'F:datasets/reid/CUHK-SYSU_nomacosx/dataset'): #r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset'
+    def __init__(self, image_set, root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset'): #r'F:datasets/reid/CUHK-SYSU_nomacosx/dataset'
         super(psdb, self).__init__('psdb_' + image_set)
         self._image_set = image_set
         # self._root_dir = self._get_default_path() if root_dir is None \
