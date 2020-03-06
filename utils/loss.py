@@ -4,6 +4,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torch import autograd
+from config import opt
 
 def topk_mask(input, dim, K = 10, **kwargs):
     index = input.topk(max(1, min(K, input.size(dim))), dim = dim, **kwargs)[1]
@@ -152,7 +153,7 @@ def oim(inputs, targets, lut, momentum=0.5):
 
 
 class OIMLoss(nn.Module):
-    def __init__(self, num_features, num_classes, scalar=10, momentum=0.5,  #1.0=>10
+    def __init__(self, num_features, num_classes, scalar=opt.oim_scalar, momentum=0.5,  #1.0=>10
                  weight=None, reduction='mean'):
         super(OIMLoss, self).__init__()
         self.num_features = num_features

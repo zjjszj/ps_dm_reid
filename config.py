@@ -12,8 +12,9 @@ class DefaultConfig(object):
     mode = 'retrieval'
     # optimization options
     loss = 'oim'  #triplet  oim  oimFusionMap
+    oim_scalar=30
     optim = 'adam'  #adam  sgd
-    max_epoch =10    #400
+    max_epoch =20    #400
     train_batch = 16
     nums_pedes=32
     test_batch = 32
@@ -38,7 +39,7 @@ class DefaultConfig(object):
     # miscs
     print_freq = 30
     #评估并保存的伦数
-    eval_step = 1
+    eval_step = 2
     save_dir = './pytorch-ckpt/market'
     workers = 4
     start_epoch = 0

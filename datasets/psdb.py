@@ -54,7 +54,7 @@ def _compute_iou(a, b):
 
 
 class psdb(imdb):
-    def __init__(self, image_set, root_dir=r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset'): #r'F:datasets/reid/CUHK-SYSU_nomacosx/dataset'
+    def __init__(self, image_set, root_dir=r'F:datasets/reid/CUHK-SYSU_nomacosx/dataset'): #r'/kaggle/input/cuhk-sysu/CUHK-SYSU_nomacosx/dataset'
         super(psdb, self).__init__('psdb_' + image_set)
         self._image_set = image_set
         # self._root_dir = self._get_default_path() if root_dir is None \
@@ -131,14 +131,12 @@ class psdb(imdb):
             for index, item in enumerate(test):
                 # query
                 im_name = str(item['Query'][0,0][0][0])
-                print('query..im_name===',im_name)
                 box = item['Query'][0,0][1].squeeze().astype(np.int32)
                 _set_box_pid(name_to_boxes[im_name], box,
                              name_to_pids[im_name], index)
                 # gallery
                 gallery = item['Gallery'].squeeze()
                 for im_name, box, __ in gallery:
-                    print('gallery...im_name===',im_name)
                     im_name = str(im_name[0])
                     if box.size == 0: break
                     box = box.squeeze().astype(np.int32)
@@ -148,14 +146,13 @@ class psdb(imdb):
         # Construct the gt_roidb
         gt_roidb = []
         #为self.image_index排序，生成按图像名升序的roidb
-        def sort_key(s):
-            # sort_strings_with_embedded_numbers
-            re_digits = re.compile(r'(\d+)')
-            pieces = re_digits.split(s)  # 切成数字与非数字
-            pieces[1::2] = map(int, pieces[1::2])  # 将数字部分转成整数
-            return pieces
-        self.image_index.sort(key=sort_key)
-        print(self.image_index)
+        # def sort_key(s):
+        #     # sort_strings_with_embedded_numbers
+        #     re_digits = re.compile(r'(\d+)')
+        #     pieces = re_digits.split(s)  # 切成数字与非数字
+        #     pieces[1::2] = map(int, pieces[1::2])  # 将数字部分转成整数
+        #     return pieces
+        # self.image_index.sort(key=sort_key)
         for im_name in self.image_index:         #im_name:图像名
             boxes = name_to_boxes[im_name]
             boxes[:, 2] += boxes[:, 0]
@@ -300,6 +297,7 @@ class psdb(imdb):
             # 1. Go through the gallery samples defined by the protocol
             for item in protoc['Gallery'][i].squeeze():
                 gallery_imname = str(item[0][0])
+                print('gallery_imname==', gallery_imname)
                 # some contain the probe (gt not empty), some not
                 gt = item[1][0].astype(np.int32)
                 count_gt += (gt.size > 0)
@@ -328,6 +326,7 @@ class psdb(imdb):
                             label[j] = 1
                             count_tp += 1
                             break
+                print('label==', label)
                 y_true.extend(list(label))
                 y_score.extend(list(sim))
                 imgs.extend([gallery_imname] * len(sim))
@@ -492,7 +491,7 @@ class psdb(imdb):
             return psdb_train_pedes
         train_roidb = self.roidb
         pede_train_data=[]
-        for i in range(5532):
+        for i in range(5532):  #5532个行人id
             pid_imnames = []
             pid_boxes = []
             for img in train_roidb:
@@ -533,15 +532,8 @@ class psdb(imdb):
 if __name__ == '__main__':
     #from datasets.psdb import psdb
 
-    train = psdb('train')
-    roidb=train.gt_roidb()
-    for img in roidb:
-        pids=img['gt_pids']
-        boxes=img['boxes']
-        for i in range(len(pids)):
-            if pids[i]!=-1:
-                print(img['im_name'])
-                print('hight=', boxes[i][3]-boxes[i][1], 'width=', boxes[i][2]-boxes[i][0])
+    roidb=psdb('train')
+    roidb.pede_train_data()
 
     # print(len(roidb))
     # d=psdb('test',root_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset')
@@ -553,9 +545,9 @@ if __name__ == '__main__':
     #from IPython import embed; embed()       #调式时使用
 
     #求query和gallery
-    #test = loadmat(osp.join(r'F:datasets/reid/CUHK-SYSU_nomacosx/dataset','annotation/test/train_test/TestG50.mat'))
-    #test = test['TestG50'].squeeze()
-    # for i in range(6978):
+    # test = loadmat(osp.join(r'F:datasets/reid/CUHK-SYSU_nomacosx/dataset','annotation/test/train_test/TestG50.mat'))
+    # test = test['TestG50'].squeeze()
+    # for i in range(2900):
     #     # Ignore the probe image
     #     probe_imname = str(test['Query'][i]['imname'][0,0][0])
     #     print('probe_imname==',probe_imname)
