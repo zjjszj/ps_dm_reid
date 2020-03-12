@@ -22,12 +22,11 @@ class Student(object):
 import torch
 import numpy as np
 import torch.nn.functional as F
-from sklearn.metrics import average_precision_score, precision_recall_curve
+from torchvision.models.resnet import resnet50
 
 if __name__ == '__main__':
-    a=np.array([0.8,0.2,0.9])
-    inds=np.argsort
-    print(ap)
+    res=resnet50()
+    print(res)
 
 
 

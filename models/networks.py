@@ -162,8 +162,8 @@ class BFE(nn.Module):
         )
         self.res_part.load_state_dict(resnet.layer4.state_dict())
         reduction = nn.Sequential(
-            nn.Conv2d(2048, 1024, 1),   #512改为1024
-            nn.BatchNorm2d(1024),
+            nn.Conv2d(2048, 128, 1),   #512改为1024
+            nn.BatchNorm2d(128),
             nn.ReLU()
         )
          # global branch
@@ -179,8 +179,8 @@ class BFE(nn.Module):
         self.part_maxpool = nn.AdaptiveMaxPool2d((1,1))
         self.batch_crop = BatchDrop(height_ratio, width_ratio)
         self.reduction = nn.Sequential(
-            nn.Linear(2048, 1024, 1),
-            nn.BatchNorm1d(1024),
+            nn.Linear(2048, 128, 1),
+            nn.BatchNorm1d(128),
             nn.ReLU()
         )
         self.reduction.apply(weights_init_kaiming)

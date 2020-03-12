@@ -107,7 +107,7 @@ def train(**kwargs):
 
     ##adding global and local vector.Using oim
     elif opt.loss=='oim':
-        embedding_criterion = OIMLoss(num_features=1024, num_classes=5532)  #num_classes=751 market1501
+        embedding_criterion = OIMLoss(num_features=128, num_classes=5532)  #num_classes=751 market1501
 
     def criterion(triplet_y, labels):  # 输出向量[全局，局部]、输出得分、标签
         losses = embedding_criterion(triplet_y, labels)[0]
@@ -131,7 +131,7 @@ def train(**kwargs):
         if ep < 11:
             lr = lr-0.00009
         elif ep < 200:
-            lr = 1e-3
+            lr = 1e-4
         elif ep < 300:
             lr = 1e-4
         else:

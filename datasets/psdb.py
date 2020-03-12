@@ -298,7 +298,6 @@ class psdb(imdb):
             # 1. Go through the gallery samples defined by the protocol
             for item in protoc['Gallery'][i].squeeze():
                 gallery_imname = str(item[0][0])
-                print('gallery_imname==', gallery_imname)
                 # some contain the probe (gt not empty), some not
                 gt = item[1][0].astype(np.int32)
                 count_gt += (gt.size > 0)
@@ -327,7 +326,6 @@ class psdb(imdb):
                             label[j] = 1
                             count_tp += 1
                             break
-                print('label==', label)
                 y_true.extend(list(label))
                 y_score.extend(list(sim))
                 imgs.extend([gallery_imname] * len(sim))

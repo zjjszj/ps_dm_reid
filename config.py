@@ -16,7 +16,7 @@ class DefaultConfig(object):
     optim = 'sgd'  #adam  sgd
     max_epoch =20    #400
     train_batch = 16
-    nums_pedes=32
+    nums_pedes=16
     test_batch = 32
     adjust_lr = True
     lr = 0.001

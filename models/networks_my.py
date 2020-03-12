@@ -146,9 +146,9 @@ class ResNetBuilder(nn.Module):
 
 
 #只使用全局分支
-class BFE(nn.Module):
+class BFE_Global(nn.Module):
     def __init__(self, num_classes, width_ratio=0.5, height_ratio=0.5):
-        super(BFE, self).__init__()
+        super(BFE_Global, self).__init__()
         resnet = resnet50(pretrained=True)
         self.backbone = nn.Sequential(
             resnet.conv1,
@@ -203,6 +203,78 @@ class BFE(nn.Module):
             {'params': self.res_part.parameters()},
             {'params': self.global_reduction.parameters()},
             {'params': self.res_part2.parameters()},
+        ]
+        return params
+
+#自己定义的网络框架
+class BFE_New(nn.Module):
+    def __init__(self, num_classes, width_ratio=0.5, height_ratio=0.5):
+        super(BFE_New, self).__init__()
+        resnet = resnet50(pretrained=True)
+        self.backbone = nn.Sequential(
+            resnet.conv1,
+            resnet.bn1,
+            resnet.relu,
+            resnet.maxpool,
+            resnet.layer1,  # res_conv2
+            resnet.layer2,  # res_conv3
+            resnet.layer3,  # res_conv4
+        )
+        self.res_part = nn.Sequential(
+            Bottleneck(1024, 512, stride=1, downsample=nn.Sequential(
+                nn.Conv2d(1024, 2048, kernel_size=1, stride=1, bias=False),  # 去掉了下采样
+                nn.BatchNorm2d(2048),
+            )),
+            Bottleneck(2048, 512),
+            Bottleneck(2048, 512),
+        )
+        self.res_part.load_state_dict(resnet.layer4.state_dict())
+        reduction = nn.Sequential(
+            nn.Conv2d(2048, 1024, 1),  # 512改为1024
+            nn.BatchNorm2d(1024),
+            nn.ReLU()
+        )
+        # global branch
+        self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.global_softmax = nn.Linear(1024, num_classes)  # 512改为1024
+        self.global_softmax.apply(weights_init_kaiming)
+        self.global_reduction = copy.deepcopy(reduction)
+        self.global_reduction.apply(weights_init_kaiming)
+
+        # part branch
+        self.res_part2 = Bottleneck(2048, 512)
+
+        self.part_maxpool = nn.AdaptiveMaxPool2d((1, 1))
+        self.batch_crop = BatchDrop(height_ratio, width_ratio)
+        self.reduction = nn.Sequential(
+            nn.Linear(2048, 128, 1),
+            nn.BatchNorm1d(128),
+            nn.ReLU()
+        )
+        self.reduction.apply(weights_init_kaiming)
+        self.softmax = nn.Linear(1024, num_classes)
+        self.softmax.apply(weights_init_kaiming)
+
+    def forward(self, x):
+        """
+        :param x: input image tensor of (N, C, H, W)
+        :return: (prediction, triplet_losses, softmax_losses)
+        """
+        x = self.backbone(x)
+        x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]
+
+        orignal=x
+        x = self.batch_crop(x)  # [32, 2048, 24, 8]
+        x=x+orignal
+        feature = self.part_maxpool(x).view(len(x), -1)  # [N, 2048] squeeze()==>view
+        feature = self.reduction(feature)  # [N, 128]
+        return feature
+
+    def get_optim_policy(self):
+        params = [
+            {'params': self.backbone.parameters()},
+            {'params': self.res_part.parameters()},
+            {'params': self.reduction.parameters()},
         ]
         return params
 
