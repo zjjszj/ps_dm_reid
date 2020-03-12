@@ -168,7 +168,7 @@ class BFE(nn.Module):
         )
          # global branch
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.global_softmax = nn.Linear(1024, num_classes)  #512改为1024
+        self.global_softmax = nn.Linear(128, num_classes)  #512改为1024
         self.global_softmax.apply(weights_init_kaiming)
         self.global_reduction = copy.deepcopy(reduction)
         self.global_reduction.apply(weights_init_kaiming)
@@ -184,7 +184,7 @@ class BFE(nn.Module):
             nn.ReLU()
         )
         self.reduction.apply(weights_init_kaiming)
-        self.softmax = nn.Linear(1024, num_classes)
+        self.softmax = nn.Linear(128, num_classes)
         self.softmax.apply(weights_init_kaiming)
 
     def forward(self, x):
@@ -232,10 +232,10 @@ class BFE(nn.Module):
             {'params': self.backbone.parameters()},
             {'params': self.res_part.parameters()},
             {'params': self.global_reduction.parameters()},
-            {'params': self.global_softmax.parameters()},
+            #{'params': self.global_softmax.parameters()},
             {'params': self.res_part2.parameters()},
             {'params': self.reduction.parameters()},
-            {'params': self.softmax.parameters()},
+            #{'params': self.softmax.parameters()},
         ]
         return params
 
