@@ -18,8 +18,8 @@ class DefaultConfig(object):
     train_batch = 16
     nums_pedes=16
     test_batch = 32
-    adjust_lr = True
-    lr = 0.001
+    adjust_lr = False
+    lr = 0.0001
     gamma = 0.1
     weight_decay = 5e-4
     momentum = 0.9
