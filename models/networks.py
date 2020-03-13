@@ -162,13 +162,13 @@ class BFE(nn.Module):
         )
         self.res_part.load_state_dict(resnet.layer4.state_dict())
         reduction = nn.Sequential(
-            nn.Conv2d(2048, 128, 1),   #512改为1024
-            nn.BatchNorm2d(128),
+            nn.Conv2d(2048, 256, 1),   #512改为1024
+            nn.BatchNorm2d(256),
             nn.ReLU()
         )
          # global branch
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.global_softmax = nn.Linear(128, num_classes)  #512改为1024
+        self.global_softmax = nn.Linear(256, num_classes)  #512改为1024
         self.global_softmax.apply(weights_init_kaiming)
         self.global_reduction = copy.deepcopy(reduction)
         self.global_reduction.apply(weights_init_kaiming)
@@ -179,12 +179,12 @@ class BFE(nn.Module):
         self.part_maxpool = nn.AdaptiveMaxPool2d((1,1))
         self.batch_crop = BatchDrop(height_ratio, width_ratio)
         self.reduction = nn.Sequential(
-            nn.Linear(2048, 128, 1),
-            nn.BatchNorm1d(128),
+            nn.Linear(2048, 256, 1),
+            nn.BatchNorm1d(256),
             nn.ReLU()
         )
         self.reduction.apply(weights_init_kaiming)
-        self.softmax = nn.Linear(128, num_classes)
+        self.softmax = nn.Linear(256, num_classes)
         self.softmax.apply(weights_init_kaiming)
 
     def forward(self, x):
