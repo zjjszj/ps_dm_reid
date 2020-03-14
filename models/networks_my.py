@@ -285,7 +285,7 @@ class ResNet_openReid(nn.Module):
         50: resnet50,
     }
 
-    def __init__(self, depth=50, pretrained=False, cut_at_pooling=False,
+    def __init__(self, depth=50, pretrained=True, cut_at_pooling=False,
                  num_features=128, norm=True, dropout=0.5, num_classes=0):
         super(ResNet_openReid, self).__init__()
 
