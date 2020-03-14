@@ -13,7 +13,7 @@ class DefaultConfig(object):
     # optimization options
     loss = 'oim'  #triplet  oim  oimFusionMap
     oim_scalar=30
-    optim = 'sgd'  #adam  sgd
+    optim = 'adam'  #adam  sgd
     max_epoch =20    #400
     train_batch = 16
     nums_pedes=16
