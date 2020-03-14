@@ -143,11 +143,13 @@ def train(**kwargs):
     best_rank1 = opt.best_rank
     best_epoch = 0
 
+    rank1 = ps_manager.evaluate(model)
+
     for epoch in range(start_epoch, opt.max_epoch):
         if opt.adjust_lr:
             adjust_lr(optimizer, epoch + 1)
 
-        reid_trainer.train(epoch, ps_manager=ps_manager)
+        #reid_trainer.train(epoch, ps_manager=ps_manager)
 
         # # skip if not save model
         # if opt.eval_step > 0 and (epoch + 1) % opt.eval_step == 0 or (epoch + 1) == opt.max_epoch:
