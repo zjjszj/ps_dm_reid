@@ -323,6 +323,9 @@ class psdb(imdb):
                     # only set the first matched det as true positive
                     for j, roi in enumerate(det[:, :4]):
                         if _compute_iou(roi, gt) >= iou_thresh:
+                            print('im_name=',gallery_imname)
+                            print('roi=',roi)
+                            print('gt=',gt)
                             label[j] = 1
                             count_tp += 1
                             break
@@ -531,9 +534,13 @@ class psdb(imdb):
 if __name__ == '__main__':
     #from datasets.psdb import psdb
 
-    roidb=psdb('train')
-    roidb.pede_train_data()
-
+    roidb=psdb('test')
+    rois=roidb.gt_roidb()
+    for img in rois:
+        if('s15539.jpg'==img['im_name'] or 's15535.jpg'==img['im_name']):
+            print(img['im_name'])
+            print(img['boxes'])
+            print(img['gt_pids'])
     # print(len(roidb))
     # d=psdb('test',root_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset')
     # test=d.gt_roidb()
