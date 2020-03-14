@@ -24,8 +24,8 @@ import numpy as np
 import torch.nn.functional as F
 
 if __name__ == '__main__':
-   a= np.argsort([2,3,4])
-   print(a)
+    pass
+
 
 
 
