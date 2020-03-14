@@ -323,11 +323,6 @@ class psdb(imdb):
                     # only set the first matched det as true positive
                     for j, roi in enumerate(det[:, :4]):
                         if _compute_iou(roi, gt) >= iou_thresh:
-                            if ('s15539.jpg' == gallery_imname or 's15535.jpg' == gallery_imname):
-                                print('im_name=',gallery_imname)
-                                print('roi=',roi)
-                                print('gt=',gt)
-                                print('j=',j)
                             label[j] = 1
                             count_tp += 1
                             break
