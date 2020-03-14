@@ -22,12 +22,10 @@ class Student(object):
 import torch
 import numpy as np
 import torch.nn.functional as F
-from torchvision.models.resnet import resnet50
 
 if __name__ == '__main__':
-    res=resnet50()
-    print(res)
-
+   a= np.argsort([2,3,4])
+   print(a)
 
 
 

@@ -119,15 +119,17 @@ def get_train_pedes():
 
 
 class TrainTransform:
-    def __call__(self, x):  #x:[pede,...]
+    def __call__(self, x, type='train'):  #x:[pede,...]
         ret=[]
         for pede in x:
             pede = T.Resize((384, 128))(pede)
-            pede = T.RandomHorizontalFlip()(pede)
+            if type=='train':
+                pede = T.RandomHorizontalFlip()(pede)
             pede = T.ToTensor()(pede)
             pede = T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(pede)
-            #Cutout预处理
-            pede = Cutout(probability = 0.5, size=64, mean=[0.0, 0.0, 0.0])(pede)   #[3, 128, 64]
+            if type=='train':
+                #Cutout预处理
+                pede = Cutout(probability = 0.5, size=64, mean=[0.0, 0.0, 0.0])(pede)   #[3, 128, 64]
             ret.append(pede)
         return ret
 
@@ -242,7 +244,7 @@ class ps_data_manager(ps_data):
                     img=read_pedeImage(im_name)
                     pede=img.crop(box)
                     pedes_Image.append(pede)
-                pedes_list=TrainTransform()(pedes_Image)  #TrainTransform返回为一个tensor的list
+                pedes_list=TrainTransform()(pedes_Image, type='test')  #TrainTransform返回为一个tensor的list
                 q_feat.extend(np.asarray(model(torch.stack(pedes_list).cuda()).cpu()))
                 #del pedes_Image, pedes_list, batch_probes
                 #gc.collect()
@@ -269,7 +271,7 @@ class ps_data_manager(ps_data):
                 for box in boxes:
                     pede_Image=image.crop(box)
                     img_Image.append(pede_Image)
-                img_list = TrainTransform()(img_Image)
+                img_list = TrainTransform()(img_Image, type='test')
                 g_feat.append(np.asarray(model(torch.stack(img_list).cuda()).cpu()))
                 del img_Image, img_list
                 gc.collect()
