@@ -130,7 +130,7 @@ def train(**kwargs):
     def adjust_lr(optimizer, ep):
         for p in optimizer.param_groups:
             lr=p['lr']
-        if ep < 11:
+        if ep < 5:
             lr = lr-0.00009
         elif ep < 200:
             lr = 1e-4

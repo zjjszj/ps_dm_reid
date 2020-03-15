@@ -24,7 +24,9 @@ import numpy as np
 import torch.nn.functional as F
 
 if __name__ == '__main__':
-    pass
+    a=torch.tensor([[1,2,3]], dtype=torch.float32)
+    b=F.normalize(a, dim=0)
+    print(b)
 
 
 

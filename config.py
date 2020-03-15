@@ -13,13 +13,13 @@ class DefaultConfig(object):
     # optimization options
     loss = 'oim'  #triplet  oim  oimFusionMap
     oim_scalar=30
-    optim = 'adam'  #adam  sgd
+    optim = 'sgd'  #adam  sgd
     max_epoch =20    #400
     train_batch = 16
     nums_pedes=16
     test_batch = 32
-    adjust_lr = False
-    lr = 0.0001
+    adjust_lr = True
+    lr = 0.001
     gamma = 0.1
     weight_decay = 5e-4
     momentum = 0.9
