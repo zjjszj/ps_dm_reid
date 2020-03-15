@@ -16,7 +16,7 @@ from datasets import data_manager
 from datasets.data_loader import ImageData
 from datasets.samplers import RandomIdentitySampler
 #from models.networks import ResNetBuilder, IDE, Resnet, BFE
-from models.networks_my import ResNetBuilder, IDE, Resnet, ResNet_openReid
+from models.networks_my import ResNetBuilder, IDE, Resnet, ResNet_openReid,BFE_New
 from trainers.evaluator import ResNetEvaluator
 from trainers.trainer import cls_tripletTrainer
 from utils.loss import CrossEntropyLabelSmooth, TripletLoss, Margin, OIMLoss
@@ -59,7 +59,7 @@ def train(**kwargs):
 
     print('initializing model ...')
     #model = BFE(5532, 1.0, 0.33)  # dataset.num_train_pids
-    model = ResNet_openReid()  # dataset.num_train_pids
+    model = BFE_New(128)  # dataset.num_train_pids
 
     optim_policy = model.get_optim_policy()
 
@@ -84,8 +84,11 @@ def train(**kwargs):
     # elif opt.loss=='oim':
     #     embedding_criterion_global = OIMLoss(num_features=512, num_classes=751)
     #     embedding_criterion_drop = OIMLoss(num_features=1024, num_classes=751)
-    elif opt.loss=='oimFusionMap':
-        embedding_criterion=OIMLoss(num_features=512,num_classes=751)
+    elif opt.loss=='oim+triplet':
+        oim_criterion=OIMLoss(num_features=128,num_classes=5532)
+        triplet_criterion = TripletLoss(opt.margin)
+
+
 
     #原始的+oim
     # def criterion(triplet_y, softmax_y, labels):   #输出向量[全局，局部]、输出得分、标签
@@ -101,18 +104,17 @@ def train(**kwargs):
     #     return loss
 
 
-    ### update network.Fusion feature map 效果不好
-    # def criterion(triplet_y, labels):   #输出向量、标签
-    #     loss = embedding_criterion(triplet_y, labels)[0]
-    #     return loss
-    ###end
+
 
     ##adding global and local vector.Using oim
     elif opt.loss=='oim':
         embedding_criterion = OIMLoss(num_features=128, num_classes=5532)  #num_classes=751 market1501
 
     def criterion(triplet_y, labels):  # 输出向量[全局，局部]、输出得分、标签
-        losses = embedding_criterion(triplet_y, labels)[0]
+        if opt.loss=='oim':
+            losses = embedding_criterion(triplet_y, labels)[0]
+        elif opt.loss=='oim+triplet':
+            losses=oim_criterion(triplet_y, labels)[0]+triplet_criterion(triplet_y, labels)[0]
         return losses
     ##end
 

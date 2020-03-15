@@ -11,9 +11,9 @@ class DefaultConfig(object):
     datatype = 'person'
     mode = 'retrieval'
     # optimization options
-    loss = 'oim'  #triplet  oim  oimFusionMap
+    loss = 'oim'  #triplet  oim  oim+triplet
     oim_scalar=30
-    optim = 'sgd'  #adam  sgd
+    optim = 'adam'  #adam  sgd
     max_epoch =20    #400
     train_batch = 16
     nums_pedes=16

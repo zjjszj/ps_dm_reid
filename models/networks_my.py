@@ -240,6 +240,13 @@ class BFE_New(nn.Module):
         self.global_softmax.apply(weights_init_kaiming)
         self.global_reduction = copy.deepcopy(reduction)
         self.global_reduction.apply(weights_init_kaiming)
+        self.smooth=nn.Sequential(
+            nn.Conv2d(2048,1024,3),
+            nn.BatchNorm2d(1024),
+            nn.ReLU()
+        )
+        self.smooth.apply(weights_init_kaiming)
+
 
         # part branch
         self.res_part2 = Bottleneck(2048, 512)
@@ -247,7 +254,7 @@ class BFE_New(nn.Module):
         self.part_maxpool = nn.AdaptiveMaxPool2d((1, 1))
         self.batch_crop = BatchDrop(height_ratio, width_ratio)
         self.reduction = nn.Sequential(
-            nn.Linear(2048, 128, 1),
+            nn.Linear(1024, 128, 1),
             nn.BatchNorm1d(128),
             nn.ReLU()
         )
@@ -266,7 +273,8 @@ class BFE_New(nn.Module):
         orignal=x
         x = self.batch_crop(x)  # [32, 2048, 24, 8]
         x=x+orignal
-        feature = self.part_maxpool(x).view(len(x), -1)  # [N, 2048] squeeze()==>view
+        x=self.smooth(x)
+        feature = self.part_maxpool(x).view(len(x), -1)  # [N, 1024] squeeze()==>view
         feature = self.reduction(feature)  # [N, 128]
         return feature
 
@@ -275,6 +283,8 @@ class BFE_New(nn.Module):
             {'params': self.backbone.parameters()},
             {'params': self.res_part.parameters()},
             {'params': self.reduction.parameters()},
+            {'params': self.smooth.parameters()},
+
         ]
         return params
 
