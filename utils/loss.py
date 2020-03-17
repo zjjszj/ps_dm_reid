@@ -72,8 +72,6 @@ def hard_example_mining(dist_mat, labels, margin, return_inds=False):
     is_neg = labels.expand(N, N).ne(labels.expand(N, N).t())
     # `dist_ap` means distance(anchor, positive)
     # both `dist_ap` and `relative_p_inds` with shape [N, 1]
-    print('dist_mat[is_pos].size()=', dist_mat[is_pos].size())
-    print('dist_mat[is_pos].contiguous().size()=', dist_mat[is_pos].contiguous().size())
     dist_ap, relative_p_inds = torch.max(
         dist_mat[is_pos].contiguous().view(N, -1), 1, keepdim=True)
     # `dist_an` means distance(anchor, negative)
