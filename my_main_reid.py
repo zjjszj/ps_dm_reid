@@ -113,7 +113,7 @@ def train(**kwargs):
         if opt.loss=='oim':
             #losses = embedding_criterion(triplet_y, labels)[0]  #单分支
             loss = [oim_criterion(output1, labels)[0] for output1 in triplet_y]
-            losses = sum(loss)/2
+            losses = sum(loss)/2 #损失值太大了
         elif opt.loss=='oim+triplet':    #triplet损失函数对训练数据有要求
             loss = [oim_criterion(output1, labels)[0] for output1 in triplet_y] + \
                 [triplet_criterion(output2, labels)[0] for output2 in triplet_y]
