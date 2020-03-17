@@ -72,7 +72,9 @@ def hard_example_mining(dist_mat, labels, margin, return_inds=False):
     is_neg = labels.expand(N, N).ne(labels.expand(N, N).t())
     # `dist_ap` means distance(anchor, positive)
     # both `dist_ap` and `relative_p_inds` with shape [N, 1]
-    print('dist_mat[is_pos].contiguous()==', dist_mat[is_pos].contiguous())
+    print('is_pos==', is_pos)
+    print('dist_mat[is_pos].size()=', dist_mat[is_pos])
+    print('dist_mat[is_pos].contiguous().size()=', dist_mat[is_pos].contiguous())
     dist_ap, relative_p_inds = torch.max(
         dist_mat[is_pos].contiguous().view(N, -1), 1, keepdim=True)
     # `dist_an` means distance(anchor, negative)
@@ -118,7 +120,6 @@ class TripletLoss(object):
         if normalize_feature:
             global_feat = normalize(global_feat, axis=-1)
         dist_mat = euclidean_dist(global_feat, global_feat)
-        print('dist_mat.size()=', dist_mat.size())
         dist_ap, dist_an = hard_example_mining(dist_mat, labels, self.margin)
         y = dist_an.new().resize_as_(dist_an).fill_(1)
         if self.margin is not None:
