@@ -222,7 +222,7 @@ class ps_data_manager(ps_data):
         pedes_y = []
         for item in indexs_batch:
             im_names = self.train_data[item]['im_name']
-            names_indexs=[i for i in len(im_names)]
+            names_indexs=[i for i in range(len(im_names))]
             if opt.loss=='oim+triplet':
                 replace = False if len(names_indexs) >= opt.num_instances else True
                 names_indexs = np.random.choice(names_indexs, size=opt.num_instances, replace=replace)
