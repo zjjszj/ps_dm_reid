@@ -116,6 +116,7 @@ class TripletLoss(object):
         #print('global_feat.shape====',global_feat.shape)  [N, 512]
         if normalize_feature:
             global_feat = normalize(global_feat, axis=-1)
+        print('global_feat.size()=', global_feat.size())
         dist_mat = euclidean_dist(global_feat, global_feat)
         dist_ap, dist_an = hard_example_mining(dist_mat, labels, self.margin)
         y = dist_an.new().resize_as_(dist_an).fill_(1)
