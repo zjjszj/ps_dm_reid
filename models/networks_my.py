@@ -346,7 +346,6 @@ class BFE_Finally(nn.Module):
         x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]
 
         predict = []
-        triplet_features = []
         softmax_features = []
 
         # global branch
@@ -354,7 +353,6 @@ class BFE_Finally(nn.Module):
         global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 512]  #squeeze()==>view
         #global_softmax_class = self.global_softmax(global_triplet_feature)
         #softmax_features.append(global_softmax_class)
-        triplet_features.append(global_triplet_feature)
         predict.append(global_triplet_feature)
 
         # part branch
@@ -364,12 +362,14 @@ class BFE_Finally(nn.Module):
         triplet_feature = self.part_maxpool(x).view(len(x), -1)  # [N, 2048] squeeze()==>view
         feature = self.reduction(triplet_feature)  # [N, 1024]
         #softmax_feature = self.softmax(feature)
-        triplet_features.append(feature)
         #softmax_features.append(softmax_feature)
         predict.append(feature)
         ##融合全局和drop局部特征向量
         #fusion_softmax = (global_softmax_class + softmax_feature) / 2
         if self.training:
+            print('predict[0].size()=', predict[0].size())
+            print('predict[1].size()=', predict[1].size())
+
             return predict
 
         else:
