@@ -28,7 +28,7 @@ class RandomIdentitySampler(Sampler):
             replace = False if len(t) >= self.num_instances else True
             t = np.random.choice(t, size=self.num_instances, replace=replace)
             ret.extend(t)
-        return iter(ret)    #[0,2,5,8,10,13,24,76....] 索引0,2,5,8都为同一个人，索引10,13,24,76都为同一个人
+        return iter(ret)    #[0,2,5,8,10,13,24,76....] 索引0,2,5,8都为同一个人图片的索引，索引10,13,24,76都为同一个人图片的索引
 
     def __len__(self):
         return self.num_identities * self.num_instances
