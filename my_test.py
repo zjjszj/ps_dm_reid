@@ -24,10 +24,10 @@ import numpy as np
 import torch.nn.functional as F
 
 if __name__ == '__main__':
-    a=[]
-    a.append(torch.tensor([1,2]))
-    a.append(torch.tensor([1,3]))
-    for aa in a:
-        print(type(aa))
+
+
+
+    replace = False if len(t) >= self.num_instances else True
+    t = np.random.choice(t, size=self.num_instances, replace=replace)
 
 

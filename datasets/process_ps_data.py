@@ -13,7 +13,7 @@ import errno
 import os
 import gc
 from datasets.ps_data import ps_data
-
+from config import opt
 
 class Cutout(object):
     def __init__(self, probability=0.5, size=64, mean=[0.4914, 0.4822, 0.4465]):
@@ -182,7 +182,7 @@ class ps_data_manager(ps_data):
         pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
         return pedes_batch_x, pedes_batch_y
 
-    def get_batchData_pedes(self, i_batch, nums_pedes):
+    def get_batchData_pedes_triplet(self, i_batch, nums_pedes):
         """
         from datasets psdb_train_pedes.pkl. get batch_size images per time. convert those images to pedes for model inputs.
         :param i_batch: index of batch
@@ -207,6 +207,37 @@ class ps_data_manager(ps_data):
         pedes_x = TrainTransform()(pedes_Image)
         pedes_batch_x = torch.stack(pedes_x)
         return pedes_batch_x, torch.tensor(pedes_y)
+
+    def get_batchData_pedes(self, i_batch, nums_pedes):
+        """
+        from datasets psdb_train_pedes.pkl. get batch_size images per time. convert those images to pedes for model inputs.
+        :param i_batch: index of batch
+        :param batch_size:
+        :return:
+        """
+        start=i_batch * nums_pedes
+        end=i_batch * nums_pedes + nums_pedes if (i_batch * nums_pedes+nums_pedes) <= len(self.train_data) else len(self.train_data)
+        indexs_batch = [self.indexs[i] for i in range(start,end)]
+        pedes_Image = []
+        pedes_y = []
+        for item in indexs_batch:
+            im_names = self.train_data[item]['im_name']
+            names_indexs=[i for i in len(im_names)]
+            if opt.loss=='oim+triplet':
+                replace = False if len(names_indexs) >= opt.num_instances else True
+                names_indexs = np.random.choice(names_indexs, size=opt.num_instances, replace=replace)
+            boxes = self.train_data[item]['boxes']
+            pid = self.train_data[item]['pid']
+            for i in names_indexs:
+                im_name=im_names[i]
+                box=boxes[i]
+                pede=read_pedeImage(im_name).crop(box)
+                pedes_Image.append(pede)
+                pedes_y.append(pid)
+        pedes_x = TrainTransform()(pedes_Image)
+        pedes_batch_x = torch.stack(pedes_x)
+        return pedes_batch_x, torch.tensor(pedes_y)
+
 
     def img_process(self, im_name, boxes, gt_pids):
         """
