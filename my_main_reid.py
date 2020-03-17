@@ -107,7 +107,7 @@ def train(**kwargs):
 
     ##adding global and local vector.Using oim
     elif opt.loss=='oim':
-        embedding_criterion = OIMLoss(num_features=128, num_classes=5532)  #num_classes=751 market1501
+        oim_criterion = OIMLoss(num_features=128, num_classes=5532)  #num_classes=751 market1501
 
     def criterion(triplet_y, labels):  # 输出向量[全局，局部]、输出得分、标签
         if opt.loss=='oim':
