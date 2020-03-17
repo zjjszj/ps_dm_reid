@@ -24,11 +24,10 @@ import numpy as np
 import torch.nn.functional as F
 
 if __name__ == '__main__':
-    a=torch.rand([3,2,2])
-    b=torch.rand([3,2,2])
-    print(a)
-    print(b)
-    c=torch.cat([a,b],2)
-    print(c)
+    a=[]
+    a.append(torch.tensor([1,2]))
+    a.append(torch.tensor([1,3]))
+    for aa in a:
+        print(type(aa))
 
 

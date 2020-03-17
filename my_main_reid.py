@@ -111,9 +111,9 @@ def train(**kwargs):
 
     def criterion(triplet_y, labels):  # 输出向量[全局，局部]、输出得分、标签
         if opt.loss=='oim':
-            losses = embedding_criterion(triplet_y, labels)[0]
+            losses = embedding_criterion(triplet_y, labels)[0] #oim_criterion(output, labels)[0]
         elif opt.loss=='oim+triplet':
-            loss = [oim_criterion(output, labels)[0] for output in triplet_y] + \
+            loss = [print(output) for output in triplet_y] + \
                 [triplet_criterion(output, labels)[0] for output in triplet_y]
             losses = sum(loss)
         return losses
