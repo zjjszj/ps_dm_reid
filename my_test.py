@@ -24,10 +24,11 @@ import numpy as np
 import torch.nn.functional as F
 
 if __name__ == '__main__':
-    a=torch.tensor([[1,2,3]], dtype=torch.float32)
-    b=F.normalize(a, dim=0)
+    a=torch.rand([3,2,2])
+    b=torch.rand([3,2,2])
+    print(a)
     print(b)
-
-
+    c=torch.cat([a,b],2)
+    print(c)
 
 

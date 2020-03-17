@@ -16,7 +16,7 @@ from datasets import data_manager
 from datasets.data_loader import ImageData
 from datasets.samplers import RandomIdentitySampler
 #from models.networks import ResNetBuilder, IDE, Resnet, BFE
-from models.networks_my import ResNetBuilder, IDE, Resnet, ResNet_openReid,BFE_New
+from models.networks_my import ResNetBuilder, IDE, Resnet, ResNet_openReid,BFE_Finally
 from trainers.evaluator import ResNetEvaluator
 from trainers.trainer import cls_tripletTrainer
 from utils.loss import CrossEntropyLabelSmooth, TripletLoss, Margin, OIMLoss
@@ -58,8 +58,7 @@ def train(**kwargs):
     ps_manager=ps_data_manager('train_pedes')
 
     print('initializing model ...')
-    #model = BFE(5532, 1.0, 0.33)  # dataset.num_train_pids
-    model = BFE_New(128)  # dataset.num_train_pids
+    model = BFE_Finally(5532, 1.0, 0.33)  # dataset.num_train_pids
 
     optim_policy = model.get_optim_policy()
 
@@ -114,7 +113,9 @@ def train(**kwargs):
         if opt.loss=='oim':
             losses = embedding_criterion(triplet_y, labels)[0]
         elif opt.loss=='oim+triplet':
-            losses=oim_criterion(triplet_y, labels)[0]+triplet_criterion(triplet_y, labels)[0]
+            loss = [oim_criterion(output, labels)[0] for output in triplet_y] + \
+                [triplet_criterion(output, labels)[0] for output in triplet_y]
+            losses = sum(loss)
         return losses
     ##end
 

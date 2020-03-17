@@ -206,7 +206,7 @@ class BFE_Global(nn.Module):
         ]
         return params
 
-#自己定义的网络框架
+#自己定义的网络框架：loss=nan
 class BFE_New(nn.Module):
     def __init__(self, num_classes, width_ratio=0.5, height_ratio=0.5):
         super(BFE_New, self).__init__()
@@ -285,6 +285,105 @@ class BFE_New(nn.Module):
             {'params': self.reduction.parameters()},
             {'params': self.smooth.parameters()},
 
+        ]
+        return params
+
+
+class BFE_Finally(nn.Module):
+    def __init__(self, num_classes, width_ratio=0.5, height_ratio=0.5):
+        super(BFE, self).__init__()
+        resnet = resnet50(pretrained=True)
+        self.backbone = nn.Sequential(
+            resnet.conv1,
+            resnet.bn1,
+            resnet.relu,
+            resnet.maxpool,
+            resnet.layer1,  # res_conv2
+            resnet.layer2,  # res_conv3
+            resnet.layer3,  # res_conv4
+        )
+        self.res_part = nn.Sequential(
+            Bottleneck(1024, 512, stride=1, downsample=nn.Sequential(
+                nn.Conv2d(1024, 2048, kernel_size=1, stride=1, bias=False),  # 去掉了下采样
+                nn.BatchNorm2d(2048),
+            )),
+            Bottleneck(2048, 512),
+            Bottleneck(2048, 512),
+        )
+        self.res_part.load_state_dict(resnet.layer4.state_dict())
+        reduction = nn.Sequential(
+            nn.Conv2d(2048, 128, 1),  # 512改为1024
+            nn.BatchNorm2d(128),
+            nn.ReLU()
+        )
+        # global branch
+        self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.global_softmax = nn.Linear(256, num_classes)  # 512改为1024
+        self.global_softmax.apply(weights_init_kaiming)
+        self.global_reduction = copy.deepcopy(reduction)
+        self.global_reduction.apply(weights_init_kaiming)
+
+        # part branch
+        self.res_part2 = Bottleneck(2048, 512)
+
+        self.part_maxpool = nn.AdaptiveMaxPool2d((1, 1))
+        self.batch_crop = BatchDrop(height_ratio, width_ratio)
+        self.reduction = nn.Sequential(
+            nn.Linear(2048, 128, 1),
+            nn.BatchNorm1d(128),
+            nn.ReLU()
+        )
+        self.reduction.apply(weights_init_kaiming)
+        self.softmax = nn.Linear(256, num_classes)
+        self.softmax.apply(weights_init_kaiming)
+
+    def forward(self, x):
+        """
+        :param x: input image tensor of (N, C, H, W)
+        :return: (prediction, triplet_losses, softmax_losses)
+        """
+        x = self.backbone(x)
+        x = self.res_part(x)  # layer4/res_conv5         [32, 2048, 24, 8]
+
+        predict = []
+        triplet_features = []
+        softmax_features = []
+
+        # global branch
+        glob = self.global_avgpool(x)  # [2048,1,1]
+        global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 512]  #squeeze()==>view
+        global_softmax_class = self.global_softmax(global_triplet_feature)
+        softmax_features.append(global_softmax_class)
+        triplet_features.append(global_triplet_feature)
+        predict.append(global_triplet_feature)
+
+        # part branch
+        x = self.res_part2(x)
+
+        x = self.batch_crop(x)  # [32, 2048, 24, 8]
+        triplet_feature = self.part_maxpool(x).view(len(x), -1)  # [N, 2048] squeeze()==>view
+        feature = self.reduction(triplet_feature)  # [N, 1024]
+        softmax_feature = self.softmax(feature)
+        triplet_features.append(feature)
+        softmax_features.append(softmax_feature)
+        predict.append(feature)
+        ##融合全局和drop局部特征向量
+        fusion_softmax = (global_softmax_class + softmax_feature) / 2
+        if self.training:
+            return predict
+
+        else:
+            return torch.cat(predict, 1)  # torch.cat(predict, 1) used to evaluate
+
+    def get_optim_policy(self):
+        params = [
+            {'params': self.backbone.parameters()},
+            {'params': self.res_part.parameters()},
+            {'params': self.global_reduction.parameters()},
+            # {'params': self.global_softmax.parameters()},
+            {'params': self.res_part2.parameters()},
+            {'params': self.reduction.parameters()},
+            # {'params': self.softmax.parameters()},
         ]
         return params
 
