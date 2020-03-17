@@ -291,7 +291,7 @@ class BFE_New(nn.Module):
 
 class BFE_Finally(nn.Module):
     def __init__(self, num_classes, width_ratio=0.5, height_ratio=0.5):
-        super(BFE, self).__init__()
+        super(BFE_Finally, self).__init__()
         resnet = resnet50(pretrained=True)
         self.backbone = nn.Sequential(
             resnet.conv1,
