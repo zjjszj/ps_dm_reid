@@ -11,7 +11,7 @@ class DefaultConfig(object):
     datatype = 'person'
     mode = 'retrieval'
     # optimization options
-    loss = 'oim+triplet'  #triplet  oim  oim+triplet
+    loss = 'oim'  #triplet  oim  oim+triplet
     num_instances=3  #when loss=oim+triplet
     oim_scalar=30
     optim = 'adam'  #adam  sgd
