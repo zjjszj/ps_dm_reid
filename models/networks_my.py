@@ -331,7 +331,7 @@ class BFE_Finally(nn.Module):
         self.reduction = nn.Sequential(
             nn.Linear(2048, 128, 1),
             nn.BatchNorm1d(128),
-            nn.ReLU()
+            #nn.ReLU()
         )
         self.reduction.apply(weights_init_kaiming)
         self.drop = nn.Dropout(0.5)
@@ -350,18 +350,18 @@ class BFE_Finally(nn.Module):
 
         # global branch
         glob = self.global_avgpool(x)  # [2048,1,1]
-        global_triplet_feature = self.global_reduction(glob) # [N, 512]  #squeeze()==>view
+        global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1) # [N, 512]  #squeeze()==>view
         global_triplet_feature=F.normalize(global_triplet_feature)
         global_triplet_feature=F.relu(global_triplet_feature)
-        global_triplet_feature=self.drop(global_triplet_feature).view(glob.size(0), -1)
         predict.append(global_triplet_feature)
 
         # part branch
         x = self.res_part2(x)
         x = self.batch_crop(x)  # [32, 2048, 24, 8]
-        triplet_feature = self.part_maxpool(x).view(len(x), -1)  # [N, 2048] squeeze()==>view
-        feature = self.reduction(triplet_feature)  # [N, 1024]
-        feature=self.drop(feature)
+        triplet_feature = self.part_maxpool(x)  # [N, 2048] squeeze()==>view
+        feature = self.reduction(triplet_feature).view(len(x), -1)  # [N, 1024]
+        feature=F.normalize(feature)
+        feature=F.relu(feature)
         predict.append(feature)
         if self.training:
             return predict
