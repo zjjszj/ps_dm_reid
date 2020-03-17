@@ -314,7 +314,7 @@ class BFE_Finally(nn.Module):
         reduction = nn.Sequential(
             nn.Conv2d(2048, 128, 1),  # 512改为1024
             nn.BatchNorm2d(128),
-            nn.ReLU()
+            #nn.ReLU()
         )
         # global branch
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
@@ -350,8 +350,10 @@ class BFE_Finally(nn.Module):
 
         # global branch
         glob = self.global_avgpool(x)  # [2048,1,1]
-        global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1)  # [N, 512]  #squeeze()==>view
-        global_triplet_feature=self.drop(global_triplet_feature)
+        global_triplet_feature = self.global_reduction(glob) # [N, 512]  #squeeze()==>view
+        global_triplet_feature=F.normalize(global_triplet_feature)
+        global_triplet_feature=F.relu(global_triplet_feature)
+        global_triplet_feature=self.drop(global_triplet_feature).view(glob.size(0), -1)
         predict.append(global_triplet_feature)
 
         # part branch
