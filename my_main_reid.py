@@ -113,8 +113,8 @@ def train(**kwargs):
         if opt.loss=='oim':
             losses = embedding_criterion(triplet_y, labels)[0]
         elif opt.loss=='oim+triplet':
-            loss = [oim_criterion(output, labels)[0] for output in triplet_y] + \
-                [triplet_criterion(output, labels)[0] for output in triplet_y]
+            loss = [oim_criterion(output1, labels)[0] for output1 in triplet_y] + \
+                [triplet_criterion(output2, labels)[0] for output2 in triplet_y]
             losses = sum(loss)
         return losses
     ##end
