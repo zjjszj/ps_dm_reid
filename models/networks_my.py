@@ -367,9 +367,6 @@ class BFE_Finally(nn.Module):
         ##融合全局和drop局部特征向量
         #fusion_softmax = (global_softmax_class + softmax_feature) / 2
         if self.training:
-            print('predict[0].size()=', predict[0].size())
-            print('predict[1].size()=', predict[1].size())
-
             return predict
 
         else:
