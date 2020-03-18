@@ -316,12 +316,19 @@ class BFE_Finally(nn.Module):
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
+        self.global_reduction=nn.Sequential(
+            nn.Linear(2048,128,1),
+            nn.BatchNorm1d(128)
+        )
+
         # global branch
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.global_softmax = nn.Linear(256, num_classes)  # 512改为1024
         self.global_softmax.apply(weights_init_kaiming)
-        self.global_reduction = copy.deepcopy(reduction)
+        #self.global_reduction = copy.deepcopy(reduction)
+        #self.global_reduction.apply(weights_init_kaiming)
         self.global_reduction.apply(weights_init_kaiming)
+
 
         # part branch
         self.res_part2 = Bottleneck(2048, 512)
@@ -348,8 +355,10 @@ class BFE_Finally(nn.Module):
         predict = []
 
         # global branch
-        glob = self.global_avgpool(x)  # [2048,1,1]
-        global_triplet_feature = self.global_reduction(glob).view(glob.size(0), -1) # [N, 512]  #squeeze()==>view
+        glob = self.global_avgpool(x).view(x.size(0), -1)  # [2048,1,1]
+        global_triplet_feature = self.global_reduction(glob) # [N, 512]  #squeeze()==>view
+        global_triplet_feature=F.normalize(global_triplet_feature)
+        global_triplet_feature=F.relu(global_triplet_feature)
         predict.append(global_triplet_feature)
 
         # part branch
