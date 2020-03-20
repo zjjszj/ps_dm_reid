@@ -24,6 +24,8 @@ import numpy as np
 import torch.nn.functional as F
 
 if __name__ == '__main__':
-    pass
+    loss = 'oim+triplet'  #triplet  oim  oim+triplet
+    print(loss.find('triplet'))
+
 
 
