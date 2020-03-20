@@ -24,10 +24,6 @@ import numpy as np
 import torch.nn.functional as F
 
 if __name__ == '__main__':
-
-
-
-    replace = False if len(t) >= self.num_instances else True
-    t = np.random.choice(t, size=self.num_instances, replace=replace)
+    pass
 
 

@@ -74,7 +74,7 @@ def train(**kwargs):
         model = nn.DataParallel(model).cuda()
 
     if opt.loss == 'triplet':
-        embedding_criterion = TripletLoss(opt.margin)
+        triplet_criterion = TripletLoss(opt.margin)
     elif opt.loss == 'lifted':
         embedding_criterion = LiftedStructureLoss(hard_mining=True)
     elif opt.loss == 'weight':
@@ -118,6 +118,9 @@ def train(**kwargs):
             loss = [oim_criterion(output1, labels)[0] for output1 in triplet_y] + \
                 [triplet_criterion(output2, labels)[0] for output2 in triplet_y]
             losses = sum(loss)/4   #损失值太大了
+        elif opt.loss == 'triplet':
+            loss = [triplet_criterion(output1, labels)[0] for output1 in triplet_y]
+            losses = sum(loss)/2 #损失值太大了
         return losses
     ##end
 
