@@ -223,6 +223,7 @@ class ps_data_manager(ps_data):
         for item in indexs_batch:
             im_names = self.train_data[item]['im_name']
             names_indexs=[i for i in range(len(im_names))]
+            #使用triplet损失函数需要对数据特殊处理
             if opt.loss.find('triplet')!=-1:
                 replace = False if len(names_indexs) >= opt.num_instances else True
                 names_indexs = np.random.choice(names_indexs, size=opt.num_instances, replace=replace)
