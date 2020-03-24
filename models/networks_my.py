@@ -316,17 +316,12 @@ class BFE_Finally(nn.Module):
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
-        self.global_reduction=nn.Sequential(
-            nn.Linear(2048,128,1),
-            nn.BatchNorm1d(128)
-        )
 
         # global branch
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.global_softmax = nn.Linear(256, num_classes)  # 512改为1024
         self.global_softmax.apply(weights_init_kaiming)
-        #self.global_reduction = copy.deepcopy(reduction)
-        #self.global_reduction.apply(weights_init_kaiming)
+        self.global_reduction = copy.deepcopy(reduction)
         self.global_reduction.apply(weights_init_kaiming)
 
 
@@ -336,9 +331,7 @@ class BFE_Finally(nn.Module):
         self.part_maxpool = nn.AdaptiveMaxPool2d((1, 1))
         self.batch_crop = BatchDrop(height_ratio, width_ratio)
         self.reduction = nn.Sequential(
-            nn.Linear(2048, 128, 1),
-            nn.BatchNorm1d(128),
-            #nn.ReLU()
+            nn.Linear(2048,128)
         )
         self.reduction.apply(weights_init_kaiming)
         self.drop = nn.Dropout(0.5)
@@ -355,20 +348,18 @@ class BFE_Finally(nn.Module):
         predict = []
 
         # global branch
-        glob = self.global_avgpool(x).view(x.size(0), -1)  # [2048,1,1]
-        global_triplet_feature = self.global_reduction(glob) # [N, 512]  #squeeze()==>view
-        global_triplet_feature=F.normalize(global_triplet_feature)
-        global_triplet_feature=F.relu(global_triplet_feature)
+        glob = self.global_avgpool(x)  # [2048,1,1]
+        global_triplet_feature = self.global_reduction(glob).view(x.size(0), -1) # [N, 512]  #squeeze()==>view
         predict.append(global_triplet_feature)
 
         # part branch
         x = self.res_part2(x)
         x = self.batch_crop(x)  # [32, 2048, 24, 8]
         triplet_feature = self.part_maxpool(x).view(len(x), -1)  # [N, 2048] squeeze()==>view
-        feature = self.reduction(triplet_feature)  # [N, 1024]
-        feature=F.normalize(feature)
-        feature=F.relu(feature)
-        predict.append(feature)
+        triplet_feature = self.reduction(triplet_feature)  # [N, 1024]
+        triplet_feature=F.normalize(triplet_feature)
+        triplet_feature=F.relu(triplet_feature)
+        predict.append(triplet_feature)
         if self.training:
             return predict
 
