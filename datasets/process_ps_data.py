@@ -182,32 +182,6 @@ class ps_data_manager(ps_data):
         pedes_batch_y = torch.tensor(pedes_batch_y, dtype=torch.long)
         return pedes_batch_x, pedes_batch_y
 
-    def get_batchData_pedes_triplet(self, i_batch, nums_pedes):
-        """
-        from datasets psdb_train_pedes.pkl. get batch_size images per time. convert those images to pedes for model inputs.
-        :param i_batch: index of batch
-        :param batch_size:
-        :return:
-        """
-        start=i_batch * nums_pedes
-        end=i_batch * nums_pedes + nums_pedes if (i_batch * nums_pedes+nums_pedes) <= len(self.train_data) else len(self.train_data)
-        indexs_batch = [self.indexs[i] for i in range(start,end)]
-        pedes_Image = []
-        pedes_y = []
-        for item in indexs_batch:
-            im_names = self.train_data[item]['im_name']
-            boxes = self.train_data[item]['boxes']
-            pid = self.train_data[item]['pid']
-            for i in range(len(im_names)):
-                im_name=im_names[i]
-                box=boxes[i]
-                pede=read_pedeImage(im_name).crop(box)
-                pedes_Image.append(pede)
-                pedes_y.append(pid)
-        pedes_x = TrainTransform()(pedes_Image)
-        pedes_batch_x = torch.stack(pedes_x)
-        return pedes_batch_x, torch.tensor(pedes_y)
-
     def get_batchData_pedes(self, i_batch, nums_pedes):
         """
         from datasets psdb_train_pedes.pkl. get batch_size images per time. convert those images to pedes for model inputs.

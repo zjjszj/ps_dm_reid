@@ -34,7 +34,7 @@ class cls_tripletTrainer:
         nums_pedes = self.opt.nums_pedes
         nums_batch=int(len(ps_manager.indexs)/nums_pedes)
         for i in range(nums_batch):
-            pedes_x, pedes_y=ps_manager.get_batchData_pedes(i,nums_pedes)
+            pedes_x, pedes_y=ps_manager.get_batchData(i,self.opt.train_batch)
             self.data=pedes_x.cuda()
             self.target=pedes_y.cuda()
         #for i, inputs in enumerate(data_loader):
