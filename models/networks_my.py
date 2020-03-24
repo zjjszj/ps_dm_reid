@@ -332,7 +332,7 @@ class BFE_Finally(nn.Module):
         self.batch_crop = BatchDrop(height_ratio, width_ratio)
         self.reduction = nn.Sequential(
             nn.Linear(2048,128),
-            nn.BatchNorm1d(),
+            nn.BatchNorm1d(128),
         )
         self.reduction.apply(weights_init_kaiming)
         self.drop = nn.Dropout(0.5)
