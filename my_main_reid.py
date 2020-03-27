@@ -58,7 +58,8 @@ def train(**kwargs):
     ps_manager=ps_data_manager('train_pedes')
 
     print('initializing model ...')
-    model = BFE_Finally(5532, 1.0, 0.33)  # dataset.num_train_pids
+    #model = BFE_Finally(5532, 1.0, 0.33)  # dataset.num_train_pids
+    model=ResNet_openReid()
 
     optim_policy = model.get_optim_policy()
 
@@ -111,9 +112,9 @@ def train(**kwargs):
 
     def criterion(triplet_y, labels):  # 输出向量[全局，局部]、输出得分、标签
         if opt.loss=='oim':
-            #losses = embedding_criterion(triplet_y, labels)[0]  #单分支
-            loss = [oim_criterion(output1, labels)[0] for output1 in triplet_y]
-            losses = sum(loss)/2 #损失值太大了
+            losses = embedding_criterion(triplet_y, labels)[0]  #单分支
+            # loss = [oim_criterion(output1, labels)[0] for output1 in triplet_y]
+            # losses = sum(loss)/2 #损失值太大了
         elif opt.loss=='oim+triplet':    #triplet损失函数对训练数据有要求
             loss = [oim_criterion(output1, labels)[0] for output1 in triplet_y] + \
                 [triplet_criterion(output2, labels)[0] for output2 in triplet_y]

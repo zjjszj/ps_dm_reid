@@ -12,7 +12,7 @@ from sklearn.preprocessing import normalize
 from torch import nn, optim
 from torch.utils.data import dataloader
 from torchvision import transforms
-from torchvision.models.resnet import Bottleneck, resnet50
+from torchvision.models.resnet import Bottleneck, resnet50, resnet101
 from torchvision.transforms import functional
 
 from .resnet import ResNet
@@ -383,7 +383,7 @@ class BFE_Finally(nn.Module):
 from torch.nn import init
 class ResNet_openReid(nn.Module):
     __factory = {
-        50: resnet50,
+        50: resnet101
     }
 
     def __init__(self, depth=50, pretrained=True, cut_at_pooling=False,

@@ -2,7 +2,6 @@ import torch
 import random
 
 #γ值与top-1图
-#γ值与top-1图
 # x1 = np.arange(0, 1, 0.05)
 # y1 = [82.2, 83.4, 84.3, 86.2, 86.2, 85.7, 87.3, 87.2, 88.4, 90.5, 90.6, 90.7, 90.3, 89.8, 87.4, 82.4, 78.2, 76.9, 72.4,
 #       72.4]
@@ -12,7 +11,7 @@ import random
 # plt.plot(x1, y1, 'r^-', color='r', linewidth=2, markersize=8)
 # plt.plot(x1, y2, '*-', color='b', linewidth=2, markersize=8)
 #
-# plt.xlabel('γ')
+# plt.xlabel('γ', fontsize='10')  # 10px为默认值
 # plt.ylabel('top-1%')
 # plt.xlim(0, 1)
 # ax = plt.gca()
@@ -38,6 +37,6 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import MultipleLocator
 
 if __name__ == '__main__':
-    pass
+    print(torch.cuda)
 
 
