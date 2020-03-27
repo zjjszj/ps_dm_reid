@@ -15,7 +15,7 @@ class DefaultConfig(object):
     num_instances=3  #when loss=oim+triplet
     oim_scalar=30
     optim = 'adam'  #adam  sgd
-    max_epoch =20    #400
+    max_epoch =1    #400
     train_batch = 16
     nums_pedes=16
     test_batch = 32

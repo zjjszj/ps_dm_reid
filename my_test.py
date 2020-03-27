@@ -36,8 +36,8 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import MultipleLocator
 import cv2
+import os
 
 if __name__ == '__main__':
-    a = np.array([[2, 3, 3.2, 3]])
-    print(np.argmax(a))
+    print(os.path.isfile())
 
