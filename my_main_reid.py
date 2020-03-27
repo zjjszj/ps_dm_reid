@@ -213,4 +213,4 @@ def test(model, queryloader):
     return rank1
 
 if __name__=="__main__":
-    main()
+    train()
