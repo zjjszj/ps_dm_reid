@@ -191,10 +191,10 @@ def train(**kwargs):
                 state_dict = model.module.state_dict()
             else:
                 pass
-            #     state_dict = model.state_dict()
-            # save_checkpoint({'state_dict': state_dict, 'epoch': epoch + 1},
-            #     is_best=is_best, save_dir=opt.save_dir,
-            #     filename='checkpoint_ep' + str(epoch + 1) + '.pth.tar')
+                state_dict = model.state_dict()
+            save_checkpoint({'state_dict': state_dict, 'epoch': epoch + 1},
+                is_best=is_best, save_dir=opt.save_dir,
+                filename='checkpoint_ep' + str(epoch + 1) + '.pth.tar')
 
     print('Best rank-1 {:.1%}, achived at epoch {}'.format(best_rank1, best_epoch))
 
@@ -211,8 +211,3 @@ def test(model, queryloader):
     rank1 = 100. * correct / len(queryloader.dataset)
     print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, len(queryloader.dataset), rank1))
     return rank1
-
-if __name__ == '__main__':
-    # import fire
-    # fire.Fire()
-    train()

@@ -35,9 +35,9 @@ import numpy as np
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import MultipleLocator
+import cv2
 
 if __name__ == '__main__':
-    
-    print(torch.cuda)
-
+    a = np.array([[2, 3, 3.2, 3]])
+    print(np.argmax(a))
 
