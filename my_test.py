@@ -37,6 +37,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import MultipleLocator
 
 if __name__ == '__main__':
+    
     print(torch.cuda)
 
 
