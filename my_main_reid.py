@@ -211,3 +211,6 @@ def test(model, queryloader):
     rank1 = 100. * correct / len(queryloader.dataset)
     print('\nTest set: Accuracy: {}/{} ({:.2f}%)\n'.format(correct, len(queryloader.dataset), rank1))
     return rank1
+
+if __name__=="__main__":
+    main()
