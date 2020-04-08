@@ -26,13 +26,13 @@ from utils.serialization import Logger, save_checkpoint
 from utils.transforms import TestTransform, TrainTransform
 #加载ps数据集
 import random
-from datasets.process_ps_data import ps_data_manager, ps_test
+from datasets.process_ps_data import ps_data_manager
 
 
 def train(**kwargs):
     opt._parse(kwargs)
 
-    # set random seed and cudnn benchmark
+    #随机初始化为相同值
     torch.manual_seed(opt.seed)
     os.makedirs(opt.save_dir, exist_ok=True)
     use_gpu = torch.cuda.is_available()
@@ -44,6 +44,7 @@ def train(**kwargs):
 
     if use_gpu:
         print('currently using GPU')
+        # 使cudnn选用最快的卷积操作，适用于网络结构在每次迭代中不会改变。cudnn.deterministic=True设置卷积算法固定。
         cudnn.benchmark = True
         torch.cuda.manual_seed_all(opt.seed)
     else:
@@ -52,6 +53,7 @@ def train(**kwargs):
     print('initializing dataset {}'.format(opt.dataset))
     dataset = data_manager.init_dataset(name=opt.dataset, mode=opt.mode)
 
+    #将数据放在锁页内存内，加快显存与内存间的访问速度但是会降低操作系统整体性能。
     pin_memory = True if use_gpu else False
 
     summary_writer = SummaryWriter(osp.join(opt.save_dir, 'tensorboard_log'))
