@@ -534,10 +534,9 @@ if __name__ == '__main__':
     roidb=psdb('test')
     rois=roidb.gt_roidb()
     for img in rois:
-        if('s15539.jpg'==img['im_name'] or 's15535.jpg'==img['im_name']):
-            print(img['im_name'])
-            print(img['boxes'])
-            print(img['gt_pids'])
+        print(img['im_name'])
+        # if (img['im_name'] == 's11202.jpg'):
+        #     print(img['im_name'])
     # print(len(roidb))
     # d=psdb('test',root_dir=r'F:\datasets\reid\CUHK-SYSU_nomacosx\dataset')
     # test=d.gt_roidb()
