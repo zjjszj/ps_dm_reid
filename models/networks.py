@@ -139,6 +139,7 @@ class ResNetBuilder(nn.Module):
                 {'params': base_param_group}
             ]
 
+
 class BFE(nn.Module):
     def __init__(self, num_classes, width_ratio=0.5, height_ratio=0.5):
         super(BFE, self).__init__()

@@ -442,7 +442,7 @@ class ResNet_openReid(nn.Module):
             x = self.feat(x)
             x = self.feat_bn(x)  #bn层：正态分布标准化
         if self.norm:
-            x = F.normalize(x)   #bn函数：归一化到[0，1]
+            x = F.normalize(x)   #bn函数
         elif self.has_embedding:
             x = F.relu(x)
         if self.dropout > 0:
